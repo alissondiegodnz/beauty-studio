@@ -1,12 +1,11 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { Plus, User, Phone, Pencil, Trash2, Search } from "lucide-react"
+import { Plus, User, Phone, Pencil, Trash2, Search, UserCheck } from "lucide-react"
 import { PageHeader } from "@/components/page-header"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { CategoryBadge } from "@/components/category-badge"
 import { StatusBadge } from "@/components/status-badge"
 import { professionalsApi } from "@/lib/api"
 import type { Professional } from "@/lib/types"
@@ -24,7 +23,7 @@ export default function ProfissionaisPage() {
 
   const loadProfessionals = async () => {
     try {
-      const response = await professionalsApi.getAll()
+      const response = await professionalsApi.getAllStatus()
       setProfessionals(response.data)
     } catch (error) {
       console.error("Error loading professionals:", error)
@@ -68,7 +67,7 @@ export default function ProfissionaisPage() {
               setEditingProfessional(null)
               setIsModalOpen(true)
             }}
-            className="bg-gradient-to-r from-[var(--color-primary)] to-[var(--color-secondary)] hover:opacity-90"
+            className="bg-gradient-to-r from-[var(--gold-accent)] to-[var(--gold-medium)] hover:opacity-70"
           >
             <Plus className="w-4 h-4 mr-2" />
             Novo Profissional
@@ -97,7 +96,7 @@ export default function ProfissionaisPage() {
             className="bg-white rounded-xl p-6 border border-[var(--color-border)] hover:shadow-lg transition-shadow"
           >
             <div className="flex items-start justify-between mb-4">
-              <div className="w-12 h-12 rounded-full bg-gradient-to-br from-[var(--color-primary)] to-[var(--color-secondary)] flex items-center justify-center">
+              <div className="w-12 h-12 rounded-full bg-gradient-to-br from-[var(--gold-accent)] to-[var(--gold-medium)] flex items-center justify-center">
                 <User className="w-6 h-6 text-white" />
               </div>
               <div className="flex gap-2">
@@ -116,18 +115,22 @@ export default function ProfissionaisPage() {
               </div>
             </div>
 
-            <h3 className="font-bold text-lg text-[var(--color-text-primary)] mb-3">{professional.name}</h3>
+            <h3 className="font-semibold text-lg text-[var(--color-text-secondary)] mb-3">{professional.name}</h3>
 
-            <div className="space-y-3">
-              <CategoryBadge category={professional.category} />
-
-              <div className="flex items-center gap-2 text-sm text-[var(--color-text-secondary)]">
-                <Phone className="w-4 h-4" />
-                <span>{professional.phone}</span>
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <div className="flex items-center gap-2 text-sm text-[var(--color-text-secondary)]">
+                  <Phone className="w-4 h-4" />
+                  <span>{professional.phone ? professional.phone : "-"}</span>
+                </div>
               </div>
-
-              <StatusBadge status={professional.status} />
             </div>
+            
+            <div className="flex items-center gap-2 text-sm text-[var(--color-text-secondary)]">
+              <UserCheck className="w-4 h-4" />
+              <span>{professional.status}</span>
+            </div>
+
           </div>
         ))}
 
@@ -137,15 +140,15 @@ export default function ProfissionaisPage() {
                 bg-white 
                 rounded-xl 
                 shadow-sm 
-                p-16 // Aumenta o padding para um visual espaçoso
+                p-16
                 flex 
                 flex-col 
                 items-center 
                 justify-center 
                 text-center 
-                border-rose-outline // Adiciona a borda
-                mx-auto // Centraliza o card se ele não ocupar 100% da largura
-                w-full // Garante que ele ocupe 100% da coluna
+                border-rose-outline
+                mx-auto
+                w-full
                 col-span-full
             "
         >

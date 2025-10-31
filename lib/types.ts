@@ -18,9 +18,9 @@ export interface Client {
 export interface Professional {
   id: string
   name: string
-  category: Category
   phone: string
   status: ProfessionalStatus
+  address: string
 }
 
 export interface Appointment {
@@ -52,12 +52,12 @@ export interface Service {
 }
 
 export interface ReportData {
-  totalRevenue: number
   todayRevenue: number
-  averageTicket: number
+  totalRevenue: number
+  averagePayment: number
   totalServices: number
   dailyRevenue: { date: string; value: number }[]
   revenueByCategory: { category: Category; value: number; percentage: number }[]
-  revenueByProfessional: { name: string; services: number; average: number; total: number }[]
+  revenueByProfessional: { name: string; services: number; total: number }[]
   paymentMethods: { method: PaymentMethod; value: number }[]
 }

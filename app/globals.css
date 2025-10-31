@@ -1,41 +1,32 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap');
 @import "tailwindcss";
 @import "tw-animate-css";
 
-/* A classe dark não será preenchida, pois você não forneceu a paleta escura em HEX. */
 @custom-variant dark (&:is(.dark *));
 
-/* ==================================== */
-/* 🎨 PALETA DE CORES SIMPLES (HEX) */
-/* ==================================== */
 :root {
-  /* Conversão do seu HSL e Cores Nomeadas para as variáveis globais do tema */
-  
-  /* HSL (345 45% 85%) -> HEX */
   --primary: #D6AAAB; 
   
-  /* HSL (345 60% 25%) -> HEX */
   --primary-foreground: #ffffff;
 
-  /* HSL (40 55% 75%) -> HEX */
   --secondary: #d6bf9380;
   
-  /* HSL (345 30% 95%) -> HEX */
   --accent: #edf7ee;
 
-  /* HSL (30 40% 98%) -> HEX */
-  --background: #F7EDED; 
+  --background: rgb(255, 242, 242); 
 
-  /* HSL (0 0% 100%) -> HEX */
+  --second-background: #ffffff;
+
   --card: #ffffff; 
 
-  --card-foreground: #662635; /* Usando primary-foreground */
+  --card-foreground: #662635;
   --popover: #ffffff;
   --popover-foreground: #662635;
   --secondary-foreground: #662635;
   --muted: #f7eded;
   --muted-foreground: #958696;
   --accent-foreground: #662635;
-  --destructive: #dc2626; /* Vermelho padrão */
+  --destructive: #dc2626;
   --destructive-foreground: #fef2f2;
   --border: #D6AAAB;
   --input: #D6AAAB;
@@ -48,7 +39,6 @@
   --chart-5: #eab308;
   --radius: 0.625rem;
 
-  /* Cores da Sidebar */
   --sidebar: var(--cream);
   --sidebar-foreground: var(--primary-foreground);
   --sidebar-primary: var(--rose-medium);
@@ -58,18 +48,17 @@
   --sidebar-border: var(--border);
   --sidebar-ring: var(--ring);
 
-  /* Variáveis HEX originais que você forneceu (Mantidas como estão) */
+  --rose-ultra-soft: #ebd9db;
   --rose-soft: #e8c4c8;
   --rose-medium: #d4a5aa;
   --rose-dark: #a67c7f;
+  --gold-ultra-light: #f8efe3;
   --gold-light: #f5e6d3;
   --gold-medium: #e6d5b8;
   --gold-accent: #d4c5aa;
   --cream: #faf8f6;
 }
 
-/* Modo Escuro - Deixamos os valores originais/padrão em OKLCH, */
-/* mas você deve substituí-los por seus próprios HEX se for usar o modo escuro. */
 .dark {
   --background: oklch(0.145 0 0);
   --foreground: oklch(0.985 0 0);
@@ -105,26 +94,20 @@
   --sidebar-ring: oklch(0.439 0 0);
 }
 
-/* ==================================== */
-/* 🌟 CLASSES DE GRADIENTE (CSS Simples) */
-/* ==================================== */
 .gradient-rose-gold {
-  /* Usando as variáveis HEX que você definiu */
   background: linear-gradient(135deg, var(--rose-soft) 0%, var(--gold-medium) 100%);
 }
 
 .gradient-soft {
-  /* Usando as variáveis HEX que você definiu e a cor #f5e6e8 */
   background: linear-gradient(135deg, var(--cream) 0%, #f5e6e8 50%, var(--rose-soft) 100%);
 }
 
 .border-rose-outline {
-  border: 1px dashed var(--rose-soft); /* Usando sua cor suave */
+  border: 1px dashed var(--rose-soft);
 }
-/* O restante do código (@theme e @layer base) permanece inalterado para manter o Tailwind funcionando. */
 
 @theme inline {
-  --font-sans: "Inter", "Inter Fallback";
+  --font-sans: "Poppins", "Inter", "Inter Fallback";
   --color-primary: var(--primary);
   --color-primary-hover: var(--primary); 
   --color-primary-light: var(--background);

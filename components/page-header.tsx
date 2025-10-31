@@ -4,27 +4,24 @@ interface PageHeaderProps {
   title: string
   description: string
   action?: ReactNode
+  className?: string
 }
 
-export function PageHeader({ title, description, action }: PageHeaderProps) {
+export function PageHeader({ title, description, action, className = "" }: PageHeaderProps) {
   return (
-    <div className="flex items-center justify-between mb-8">
-      <div>
+    <div className="flex flex-col items-center justify-center mb-12 w-full">
+      <div className="text-center mb-4">
         <h1 
           className="
             text-3xl 
-            font-bold 
+            font-semibold 
             mb-1
             
-            // 1. Definição do Gradiente
-            bg-gradient-to-r
-            from-[var(--color-primary)]
-            to-[var(--color-secondary)]
+            bg-gradient-to-t
+            from-[var(--gold-accent)]
+            to-[var(--gold-medium)]
             
-            // 2. Aplicar o Gradiente ao Texto (Cortar o Fundo pelo Texto)
             bg-clip-text
-            
-            // 3. Tornar o Texto Transparente para Ver o Gradiente
             text-transparent 
           "
         >

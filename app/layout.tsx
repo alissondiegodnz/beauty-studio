@@ -1,16 +1,18 @@
 import type React from "react"
 import type { Metadata } from "next"
-import { Inter } from "next/font/google"
 import "./globals.css"
 import { Sidebar } from "@/components/sidebar"
 import { TopHeader } from "@/components/top-header"
 
-const inter = Inter({ subsets: ["latin"] })
-
 export const metadata: Metadata = {
-  title: "Maria Diniz - Gestão de Salão",
-  description: "Sistema de gestão para salão de beleza",
-    generator: 'v0.app'
+  title: "Maria Diniz",
+  description: "Sistema de gestão para estúdio de beleza",
+    generator: 'v0.app',
+    icons: {
+      icon: '/logo.png',
+      shortcut: '/logo.png',
+      apple: '/logo.png'
+    }
 }
 
 export default function RootLayout({
@@ -20,11 +22,20 @@ export default function RootLayout({
 }) {
   return (
     <html lang="pt-BR">
-      <body className={inter.className}>
-        <div className="flex min-h-screen">
-          <Sidebar />
-          <main className="flex-1 p-8">{children}</main>
-        </div>
+  <body>
+        {<TopHeader />}
+          <div className="flex rounded-1x2 min-h-[calc(100vh-4rem)]">
+            <main className="flex p-6 bg-[var(--second-background)] rounded-1x2">
+              <div className="rounded-xl bg-gradient-to-b from-[var(--background)] to-[var(--gold-ultra-light)] p-1 h-full">
+                <Sidebar />
+              </div>
+            </main>
+            <main className="flex-1 p-6 bg-[var(--second-background)] rounded-1x2">
+              <div className="rounded-xl bg-gradient-to-b from-[var(--background)] to-[var(--gold-ultra-light)] shadow-sm p-16 h-full">
+                {children}
+              </div>
+            </main>
+          </div>
       </body>
     </html>
   )

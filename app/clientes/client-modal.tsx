@@ -10,6 +10,7 @@ import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { clientsApi } from "@/lib/api"
 import type { Client } from "@/lib/types"
+import { AxiosError } from "axios"
 
 interface ClientModalProps {
   isOpen: boolean
@@ -46,6 +47,14 @@ export function ClientModal({ isOpen, onClose, onSave, client }: ClientModalProp
           observations: "",
         })
       }
+    } else {
+        setFormData({
+          name: "",
+          phone: "",
+          email: "",
+          birthDate: "",
+          observations: "",
+        })
     }
   }, [isOpen, client])
 
@@ -60,7 +69,8 @@ export function ClientModal({ isOpen, onClose, onSave, client }: ClientModalProp
       }
 
       onSave()
-    } catch (error) {
+    } catch (error: AxiosError | any) {
+      alert(error.response.data.message)
       console.error("Error saving client:", error)
     }
   }
@@ -133,18 +143,18 @@ export function ClientModal({ isOpen, onClose, onSave, client }: ClientModalProp
               id="observations"
               value={formData.observations}
               onChange={(e) => setFormData({ ...formData, observations: e.target.value })}
-              placeholder="Preferências, alergias, etc."
+              placeholder="Preferências, endereço, etc."
               rows={3}
             />
           </div>
 
           <div className="flex justify-end gap-3 pt-4">
-            <Button type="button" variant="outline" onClick={onClose}>
+            <Button type="button" className="bg-white hover:opacity-70" variant="outline" onClick={onClose}>
               Cancelar
             </Button>
             <Button
               type="submit"
-              className="bg-gradient-to-r from-[var(--color-primary)] to-[var(--color-secondary)] hover:opacity-90"
+              className="bg-gradient-to-r from-[var(--gold-accent)] to-[var(--gold-medium)] hover:opacity-70"
             >
               {client ? "Atualizar" : "Criar"}
             </Button>

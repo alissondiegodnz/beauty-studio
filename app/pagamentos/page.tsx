@@ -1,43 +1,84 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { Plus, CalendarIcon, Tag, User, DollarSign, CreditCard, Clock, Pencil, Trash2 } from "lucide-react"
+import { Plus, CalendarIcon, Tag, DollarSign, CreditCard, Clock, Pencil, Trash2, Package, UserCog, Users } from "lucide-react"
 import { PageHeader } from "@/components/page-header"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { CategoryBadge } from "@/components/category-badge"
-import { servicesApi } from "@/lib/api"
-import type { Service } from "@/lib/types"
+import { servicesApi, professionalsApi, clientsApi } from "@/lib/api"
+import type { Service, Professional, Client } from "@/lib/types"
 import { ServiceModal } from "./service-modal"
+
+function formatGmt3Date(offsetDays = 0) {
+  const ms = Date.now() - 3 * 60 * 60 * 1000 + offsetDays * 24 * 60 * 60 * 1000
+  return new Date(ms).toISOString().slice(0, 10)
+}
 
 export default function PagamentosPage() {
   const [services, setServices] = useState<Service[]>([])
-  const [selectedDate, setSelectedDate] = useState("2025-10-26")
+  const [startDate, setStartDate] = useState(() => formatGmt3Date(-1))
+  const [endDate, setEndDate] = useState(() => formatGmt3Date(0))
   const [selectedCategory, setSelectedCategory] = useState<string>("all")
-  const [isModalOpen, setIsModalOpen] = useState(false)
-  const [editingService, setEditingService] = useState<Service | null>(null)
+  const [selectedProfessional, setSelectedProfessional] = useState<string>("all")
+  const [clientSearchTerm, setClientSearchTerm] = useState("")
+  const [professionals, setProfessionals] = useState<Professional[]>([])
+  const [allServices, setAllServices] = useState<Service[]>([])
+  const [modalState, setModalState] = useState<{ isOpen: boolean; service: Service | null }>({
+    isOpen: false,
+    service: null
+  })
 
   useEffect(() => {
     loadServices()
-  }, [selectedDate, selectedCategory])
+  }, [startDate, endDate, selectedCategory, selectedProfessional])
+
+  useEffect(() => {
+    filterServices()
+  }, [allServices, clientSearchTerm])
+
+  useEffect(() => {
+    const loadInitialData = async () => {
+      try {
+        const profResp = await professionalsApi.getAll()
+        setProfessionals(profResp.data)
+      } catch (err) {
+        console.error('Error loading professionals:', err)
+      }
+    }
+    loadInitialData()
+  }, [])
 
   const loadServices = async () => {
     try {
       const params: any = {}
-      if (selectedDate) params.date = selectedDate
+      if (startDate) params.startDate = startDate
+      if (endDate) params.endDate = endDate
       if (selectedCategory !== "all") params.category = selectedCategory
+      if (selectedProfessional !== "all") params.professionalId = selectedProfessional
 
       const response = await servicesApi.getAll(params)
-      setServices(response.data)
+      setAllServices(response.data)
     } catch (error) {
       console.error("Error loading services:", error)
     }
   }
 
+  const filterServices = () => {
+    let filtered = allServices
+
+    if (clientSearchTerm) {
+      filtered = filtered.filter(service => 
+        service.clientName.toLowerCase().includes(clientSearchTerm.toLowerCase())
+      )
+    }
+
+    setServices(filtered)
+  }
+
   const handleEdit = (service: Service) => {
-    setEditingService(service)
-    setIsModalOpen(true)
+    setModalState({ isOpen: true, service })
   }
 
   const handleDelete = async (id: string) => {
@@ -52,9 +93,12 @@ export default function PagamentosPage() {
   }
 
   const handleSave = () => {
-    setIsModalOpen(false)
-    setEditingService(null)
+    setModalState({ isOpen: false, service: null })
     loadServices()
+  }
+
+  const handleCloseModal = () => {
+    setModalState({ isOpen: false, service: null })
   }
 
   return (
@@ -64,11 +108,8 @@ export default function PagamentosPage() {
         description="Registre os atendimentos realizados"
         action={
           <Button
-            onClick={() => {
-              setEditingService(null)
-              setIsModalOpen(true)
-            }}
-            className="bg-gradient-to-r from-[var(--color-primary)] to-[var(--color-secondary)] hover:opacity-90"
+            onClick={() => { setModalState({ isOpen: true, service: null })}}
+            className="bg-gradient-to-r from-[var(--gold-accent)] to-[var(--gold-medium)] hover:opacity-70"
           >
             <Plus className="w-4 h-4 mr-2" />
             Novo Pagamento
@@ -76,37 +117,105 @@ export default function PagamentosPage() {
         }
       />
 
-      {/* Filters */}
-      <div className="grid grid-cols-2 gap-4 mb-6 p-4 bg-white rounded-xl shadow-md border border-[var(--color-border)]">
-        <div>
-          <label className="flex items-center gap-2 text-sm font-medium mb-2 text-[var(--color-text-primary)]">
-            <CalendarIcon className="w-4 h-4" />
-            Data
-          </label>
-          <Input
-            type="date"
-            value={selectedDate}
-            onChange={(e) => setSelectedDate(e.target.value)}
-            className="border-[var(--color-border)]"
-          />
+      {/* Filtros */}
+      <div className="grid grid-cols-5 gap-6 mb-6">
+        {/* Card de Data */}
+        <div className="col-span-2 p-4 bg-white rounded-xl shadow-md border border-[var(--color-border)]">
+          <h3 className="text-sm font-medium mb-4 text-[var(--color-text-primary)]">Período</h3>
+          <div className="grid grid-cols-2 gap-6">
+            <div>
+              <label className="flex items-center gap-2 text-sm font-medium mb-2 text-[var(--color-text-primary)]">
+                <CalendarIcon className="w-4 h-4" />
+                Data Início
+              </label>
+              <Input id="startDate" type="date" value={startDate} onChange={(e) => setStartDate(e.target.value)} />
+            </div>
+            <div>
+              <label className="flex items-center gap-2 text-sm font-medium mb-2 text-[var(--color-text-primary)]">
+                <CalendarIcon className="w-4 h-4" />
+                Data Fim
+              </label>
+              <Input id="endDate" type="date" value={endDate} onChange={(e) => setEndDate(e.target.value)} />
+            </div>
+          </div>
         </div>
-        <div>
-          <label className="flex items-center gap-2 text-sm font-medium mb-2 text-[var(--color-text-primary)]">
-            <Tag className="w-4 h-4" />
-            Categoria
-          </label>
-          <Select value={selectedCategory} onValueChange={setSelectedCategory}>
-            <SelectTrigger className="border-[var(--color-border)]">
-              <SelectValue placeholder="Todas as Categorias" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">Todas as Categorias</SelectItem>
-              <SelectItem value="Salão">Salão</SelectItem>
-              <SelectItem value="Estética">Estética</SelectItem>
-              <SelectItem value="Bronze">Bronze</SelectItem>
-              <SelectItem value="Loja de roupas">Loja de roupas</SelectItem>
-            </SelectContent>
-          </Select>
+
+        {/* Card de Filtros */}
+        <div className="col-span-3 p-4 bg-white rounded-xl shadow-md border border-[var(--color-border)]">
+          <h3 className="text-sm font-medium mb-4 text-[var(--color-text-primary)]">Filtros</h3>
+          <div className="grid grid-cols-3 gap-6">
+            <div>
+              <label className="flex items-center gap-2 text-sm font-medium mb-2 text-[var(--color-text-primary)]">
+                <Tag className="w-4 h-4" />
+                Categoria
+              </label>
+              <Select value={selectedCategory} onValueChange={setSelectedCategory}>
+                <SelectTrigger className="border-[var(--color-border)]">
+                  <SelectValue placeholder="Todas as Categorias" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">Todas as Categorias</SelectItem>
+                  <SelectItem value="Salão">Salão</SelectItem>
+                  <SelectItem value="Estética">Estética</SelectItem>
+                  <SelectItem value="Bronze">Bronze</SelectItem>
+                  <SelectItem value="Loja de roupas">Loja de roupas</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            
+            <div>
+              <label className="flex items-center gap-2 text-sm font-medium mb-2 text-[var(--color-text-primary)]">
+                <UserCog className="w-4 h-4" />
+                Profissional
+              </label>
+              <Select value={selectedProfessional} onValueChange={setSelectedProfessional}>
+                <SelectTrigger className="border-[var(--color-border)]">
+                  <SelectValue placeholder="Todos os Profissionais" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">Todos os Profissionais</SelectItem>
+                  {professionals.map((p) => (
+                    <SelectItem key={p.id} value={String(p.id)}>{p.name}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div>
+              <label className="flex items-center gap-2 text-sm font-medium mb-2 text-[var(--color-text-primary)]">
+                <Users className="w-4 h-4" />
+                Cliente
+              </label>
+              <Input 
+                type="text"
+                placeholder="Buscar cliente..."
+                className="border-[var(--color-border)]"
+                value={clientSearchTerm}
+                onChange={(e) => setClientSearchTerm(e.target.value)}
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* KPI Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        <div className="bg-gradient-to-br from-[var(--gold-accent)] to-[var(--gold-medium)] rounded-xl p-6 text-white shadow-lg">
+          <div className="flex items-center gap-2 mb-2">
+            <DollarSign className="w-5 h-5" />
+            <span className="text-sm opacity-90">Receita Total</span>
+          </div>
+          <p className="text-3xl font-bold">R$ {services.reduce((sum, s) => sum + (s?.value || 0), 0).toFixed(2)}</p>
+          <p className="text-xs opacity-75 mt-1">No período</p>
+        </div>
+
+        <div className="bg-white rounded-xl p-6 border border-[var(--color-border)]">
+          <div className="flex items-center gap-2 mb-2 text-[var(--color-text-secondary)]">
+            <Package className="w-5 h-5" />
+            <span className="text-sm">Total de Pagamentos</span>
+          </div>
+          <p className="text-3xl font-bold text-[var(--color-primary)]">{services.length}</p>
+          <p className="text-xs text-[var(--color-text-secondary)] mt-1">No período</p>
         </div>
       </div>
 
@@ -114,7 +223,7 @@ export default function PagamentosPage() {
       <div className="grid grid-cols-1 gap-4">
         {services.map((service) => (
           <div
-            key={service.id}
+            key={String(service.id)}
             className="bg-white rounded-xl p-6 border border-[var(--color-border)] hover:shadow-lg transition-shadow"
           >
             <div className="flex items-start justify-between mb-4">
@@ -127,7 +236,7 @@ export default function PagamentosPage() {
                   <Pencil className="w-4 h-4" />
                 </button>
                 <button
-                  onClick={() => handleDelete(service.id)}
+                  onClick={() => handleDelete(String(service.id))}
                   className="p-2 text-red-500 hover:bg-red-50 rounded-lg transition-colors"
                 >
                   <Trash2 className="w-4 h-4" />
@@ -137,13 +246,17 @@ export default function PagamentosPage() {
 
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <div className="flex items-center gap-2 text-[var(--color-text-primary)]">
-                  <User className="w-4 h-4 text-[var(--color-text-secondary)]" />
-                  <span className="font-medium">{service.clientName}</span>
+                <div className="flex items-center gap-2 font-bold text-[var(--color-text-secondary)]">
+                  <Users className="w-4 h-4 text-[var(--color-text-secondary)]" />
+                  <span className="font-semibold">{service.clientName}</span>
+                </div>
+                <div className="flex items-center gap-2 text-[var(--color-text-secondary)] text-sm">
+                  <UserCog className="w-4 h-4" />
+                  <span>{service.professionalName}</span>
                 </div>
                 <div className="flex items-center gap-2 text-[var(--color-text-secondary)] text-sm">
                   <CalendarIcon className="w-4 h-4" />
-                  <span>{new Date(service.date).toLocaleDateString("pt-BR")}</span>
+                  <span>{new Date(`${service.date}T12:00:00`).toLocaleDateString("pt-BR")}</span>
                   <Clock className="w-4 h-4 ml-2" />
                   <span>{service.time}</span>
                 </div>
@@ -160,10 +273,6 @@ export default function PagamentosPage() {
                 </div>
               </div>
             </div>
-
-            <div className="mt-4 pt-4 border-t border-[var(--color-border)]">
-              <p className="text-sm text-[var(--color-text-secondary)]">Profissional: {service.professionalName}</p>
-            </div>
           </div>
         ))}
 
@@ -173,33 +282,33 @@ export default function PagamentosPage() {
                 bg-white 
                 rounded-xl 
                 shadow-sm 
-                p-16 // Aumenta o padding para um visual espaçoso
+                p-16
                 flex 
                 flex-col 
                 items-center 
                 justify-center 
                 text-center 
-                border-rose-outline // Adiciona a borda
-                mx-auto // Centraliza o card se ele não ocupar 100% da largura
-                w-full // Garante que ele ocupe 100% da coluna
+                border-rose-outline
+                mx-auto
+                w-full
             "
         >
             <DollarSign className="w-12 h-12 text-[var(--color-primary)] mb-4" />
             <h3 className="text-lg font-medium text-[var(--color-text-primary)] mb-1">
                 Nenhum pagamento encontrado
             </h3>
+            <p className="text-sm text-[var(--color-text-secondary)]">
+                no período informado
+            </p>
           </div>
         )}
       </div>
 
       <ServiceModal
-        isOpen={isModalOpen}
-        onClose={() => {
-          setIsModalOpen(false)
-          setEditingService(null)
-        }}
+        isOpen={modalState.isOpen}
+        onClose={handleCloseModal}
         onSave={handleSave}
-        service={editingService}
+        service={modalState.service}
       />
     </div>
   )
