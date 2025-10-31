@@ -31,7 +31,7 @@ export function Sidebar() {
   const pathname = usePathname()
 
   return (
-    <aside className="w-95 min-h-screen bg-gradient-to-t from-[var(--gold-ultra-light)] to-[var(--background)] flex flex-col">
+    <aside className="w-95 min-h-screen bg-gradient-to-t from-[var(--gold-light)] to-[var(--gold-ultra-light)] flex flex-col">
       <div className="p-8 pl-10">
         <div className="flex items-center justify-center">
           <div className="w-47 h-47 p-2 rounded-full flex items-center justify-center">
@@ -70,7 +70,7 @@ export function Sidebar() {
                     "flex items-center justify-center gap-2 px-4 py-5 rounded-lg transition-all text-sm font-medium",
                     isActive
                       ? "bg-gradient-to-r from-[var(--gold-accent)] to-[var(--gold-medium)] text-white shadow-lg"
-                      : "text-[var(--color-text-secondary)] hover:bg-[var(--color-primary-light)] hover:text-[var(--color-primary)]",
+                      : "text-[var(--color-text-secondary)] hover:bg-[var(--gold-light)]",
                   )}
                 >
                   <Icon className="w-5 h-5" />

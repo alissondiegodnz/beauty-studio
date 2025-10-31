@@ -13,7 +13,8 @@
   
   --accent: #edf7ee;
 
-  --background: rgb(255, 242, 242); 
+  --background: rgb(250, 244, 255);
+  --background2: rgb(255, 242, 242);
 
   --second-background: #ffffff;
 
@@ -54,8 +55,10 @@
   --rose-dark: #a67c7f;
   --gold-ultra-light: #f8efe3;
   --gold-light: #f5e6d3;
-  --gold-medium: #e6d5b8;
-  --gold-accent: #d4c5aa;
+  --gold-medium: #dbba93;
+  --gold-accent: #c0a979;
+  --gold-medium2: #e6d5b8;
+  --gold-accent2: #d4c5aa;
   --cream: #faf8f6;
 }
 

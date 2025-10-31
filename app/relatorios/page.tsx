@@ -10,13 +10,21 @@ import { BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Toolti
 import { reportsApi, professionalsApi } from "@/lib/api"
 import type { Professional } from "@/lib/types"
 import type { ReportData } from "@/lib/types"
+import { startOfMonth, endOfMonth, format } from 'date-fns';
 
 const COLORS = ["#e8c4c8", "#d4c5aa", "#ce9d5eff", "#d39b9fff"]
 
 export default function RelatoriosPage() {
   const [reportData, setReportData] = useState<ReportData | null>(null)
-  const [startDate, setStartDate] = useState("2025-10-01")
-  const [endDate, setEndDate] = useState("2025-10-31")
+  
+  const [startDate, setStartDate] = useState(() => 
+  format(startOfMonth(new Date()), 'yyyy-MM-dd')
+  );
+
+  const [endDate, setEndDate] = useState(() => 
+    format(endOfMonth(new Date()), 'yyyy-MM-dd')
+  );
+
   const [selectedCategory, setSelectedCategory] = useState<string>("all")
   const [professionals, setProfessionals] = useState<Professional[]>([])
   const [selectedProfessional, setSelectedProfessional] = useState<string>("all")
@@ -232,7 +240,7 @@ export default function RelatoriosPage() {
           <h3 className="font-bold text-lg mb-4 text-[var(--color-text-primary)]">Receita por Profissional</h3>
           <div className="space-y-4">
             {reportData.revenueByProfessional.map((professional, index) => (
-              <div key={index} className="flex items-center justify-between p-4 bg-[var(--color-background)] rounded-lg">
+              <div key={index} className="flex items-center justify-between p-4 bg-[var(--gold-ultra-light)] rounded-lg">
                 <div className="flex items-center gap-3">
                   <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[var(--color-primary)] to-[var(--color-secondary)] flex items-center justify-center text-white font-bold">
                     {professional.name.charAt(0)}
