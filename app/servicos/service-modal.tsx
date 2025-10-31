@@ -7,17 +7,17 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { worksApi } from "@/lib/api"
-import type { Work, Category, ProfessionalStatus } from "@/lib/types"
+import { servicesApi } from "@/lib/api"
+import type { Service, Category, ProfessionalStatus } from "@/lib/types"
 
-interface WorkModalProps {
+interface ServiceModalProps {
   isOpen: boolean
   onClose: () => void
   onSave: () => void
-  work: Work | null
+  service: Service | null
 }
 
-export function WorkModal({ isOpen, onClose, onSave, work }: WorkModalProps) {
+export function ServiceModal({ isOpen, onClose, onSave, service }: ServiceModalProps) {
   const getInitialFormData = () => ({
     name: "",
     category: "" as Category | "",
@@ -34,19 +34,19 @@ export function WorkModal({ isOpen, onClose, onSave, work }: WorkModalProps) {
       setFormData(getInitialFormData())
       return
     }
-    if (work) {
+    if (service) {
         requestAnimationFrame(() => {
             const newFormData = {
-                name: work.name,
-                category: work.category as Category,
+                name: service.name,
+                category: service.category as Category,
                 status: "Ativo" as ProfessionalStatus,
-                price: String(work.price ?? ""),
-                description: work.description ?? ""
+                price: String(service.price ?? ""),
+                description: service.description ?? ""
             }
             setFormData(newFormData)
         })
     }
-  }, [isOpen, work])
+  }, [isOpen, service])
 
   useEffect(() => {
     console.log("formData changed:", formData)
@@ -71,10 +71,10 @@ export function WorkModal({ isOpen, onClose, onSave, work }: WorkModalProps) {
         status: formData.status as ProfessionalStatus
       }
 
-      if (work) {
-        await worksApi.update(work.id, data)
+      if (service) {
+        await servicesApi.update(service.id, data)
       } else {
-        await worksApi.create(data)
+        await servicesApi.create(data)
       }
 
       onSave()
@@ -91,7 +91,7 @@ export function WorkModal({ isOpen, onClose, onSave, work }: WorkModalProps) {
       <div className="bg-white rounded-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto">
         <div className="sticky top-0 bg-white border-b border-[var(--color-border)] p-6 flex items-center justify-between">
           <h2 className="text-xl font-bold text-[var(--color-text-primary)]">
-            {work ? "Editar Serviço" : "Novo Serviço"}
+            {service ? "Editar Serviço" : "Novo Serviço"}
           </h2>
           <button onClick={onClose} className="p-2 hover:bg-gray-100 rounded-lg transition-colors">
             <X className="w-5 h-5" />
@@ -185,7 +185,7 @@ export function WorkModal({ isOpen, onClose, onSave, work }: WorkModalProps) {
               type="submit"
               className="bg-gradient-to-r from-[var(--gold-accent)] to-[var(--gold-medium)] hover:opacity-70"
             >
-              {work ? "Atualizar" : "Criar"}
+              {service ? "Atualizar" : "Criar"}
             </Button>
           </div>
         </form>

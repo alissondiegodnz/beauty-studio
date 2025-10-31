@@ -1,23 +1,23 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { Pencil, PlusCircle, Scissors, Trash2, Wrench } from "lucide-react"
+import { DollarSign, Pencil, PlusCircle, Scissors, Trash2, Wrench } from "lucide-react"
 import { PageHeader } from "@/components/page-header"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { worksApi } from "@/lib/api"
-import type { Work } from "@/lib/types"
-import { WorkModal } from "./work-modal"
+import { servicesApi } from "@/lib/api"
+import type { Service } from "@/lib/types"
+import { ServiceModal } from "./service-modal"
 import { CategoryBadge } from "@/components/category-badge"
 import { StatusBadge } from "@/components/status-badge"
 
-export default function WorksPage() {
-  const [works, setWorks] = useState<Work[]>([])
+export default function ServicesPage() {
+  const [services, setServices] = useState<Service[]>([])
   const [filterCategory, setFilterCategory] = useState("All")
   const [filterName, setFilterName] = useState("")
   const [isModalOpen, setIsModalOpen] = useState(false)
-  const [selectedWork, setSelectedWork] = useState<Work | null>(null)
+  const [selectedService, setSelectedService] = useState<Service | null>(null)
 
   const limitarTexto = (texto: string, limite: number): string => {
     if (texto.length > limite) {
@@ -26,55 +26,55 @@ export default function WorksPage() {
     return texto;
   };
 
-  const loadWorks = async () => {
+  const loadServices = async () => {
     try {
-      const response = await worksApi.getAll()
-      setWorks(response.data)
+      const response = await servicesApi.getAll()
+      setServices(response.data)
     } catch (error) {
       console.error("Erro ao carregar serviços:", error)
     }
   }
 
   useEffect(() => {
-    loadWorks()
+    loadServices()
   }, [])
 
-  const filteredWorks = works.filter((work) => {
-    const matchesCategory = filterCategory != "All" ? work.category === filterCategory : true
+  const filteredServices = services.filter((service) => {
+    const matchesCategory = filterCategory != "All" ? service.category === filterCategory : true
     const matchesName = filterName
-      ? work.name.toLowerCase().includes(filterName.toLowerCase())
+      ? service.name.toLowerCase().includes(filterName.toLowerCase())
       : true
     return matchesCategory && matchesName
   })
 
-  const handleNewWork = () => {
-    setSelectedWork(null)
+  const handleNewService = () => {
+    setSelectedService(null)
     setIsModalOpen(true)
   }
 
-  const handleEditWork = (work: Work) => {
-    setSelectedWork(work)
+  const handleEditService = (service: Service) => {
+    setSelectedService(service)
     setIsModalOpen(true)
   }
 
-  const handleDeleteWork = async (id: string) => {
+  const handleDeleteService = async (id: string) => {
     if (!confirm("Deseja realmente excluir este serviço?")) return
     try {
-      await worksApi.delete(id)
-      loadWorks()
+      await servicesApi.delete(id)
+      loadServices()
     } catch (error) {
       console.error("Erro ao excluir serviço:", error)
     }
   }
 
   return (
-    <div className="space-y-6">
+    <div className="mx-auto max-w-7xl">
       <PageHeader
         title="Serviços"
         description="Gerencie os serviços disponíveis em seu estabelecimento."
       />
 
-      <div className="flex flex-wrap gap-3">
+      <div className="flex flex-wrap gap-3 mb-6">
         <Input
           placeholder="Buscar por nome"
           className="max-w-xs"
@@ -95,7 +95,7 @@ export default function WorksPage() {
         </Select>
 
         <Button
-          onClick={handleNewWork}
+          onClick={handleNewService}
           className="ml-auto bg-gradient-to-r from-[var(--gold-accent)] to-[var(--gold-medium)] hover:opacity-70"
         >
           <PlusCircle className="mr-2 h-4 w-4" /> Novo Serviço
@@ -103,25 +103,25 @@ export default function WorksPage() {
       </div>
 
       <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {filteredWorks.map((work) => (
+        {filteredServices.map((service) => (
           <div
-            key={String(work.id)}
+            key={String(service.id)}
             className="border rounded-xl p-4 shadow-sm hover:shadow-md transition-shadow bg-white"
           >
             <div className="flex items-start justify-between mb-4">
               <div className="flex gap-2">
-                <StatusBadge status={work.status} />
-                <CategoryBadge category={work.category} />
+                <StatusBadge status={service.status} />
+                <CategoryBadge category={service.category} />
               </div>
               <div className="flex gap-2">
                 <button
-                  onClick={() => handleEditWork(work)}
+                  onClick={() => handleEditService(service)}
                   className="p-2 text-[var(--color-primary)] hover:bg-[var(--color-primary-light)] rounded-lg transition-colors"
                 >
                   <Pencil className="w-4 h-4" />
                 </button>
                 <button
-                  onClick={() => handleDeleteWork(String(work.id))}
+                  onClick={() => handleDeleteService(String(service.id))}
                   className="p-2 text-red-500 hover:bg-red-50 rounded-lg transition-colors"
                 >
                   <Trash2 className="w-4 h-4" />
@@ -129,19 +129,18 @@ export default function WorksPage() {
               </div>
             </div>
             <div className="flex items-center justify-between mb-2">
-              <h3 className="text-lg font-semibold">{work.name}</h3>
+              <h3 className="text-lg font-semibold">{service.name}</h3>
 
             </div>
-            <p className="text-sm text-muted-foreground mb-3">{limitarTexto(String(work.description), 50)}</p>
-            <div className="flex justify-between items-center text-sm">
-              <span className="font-semibold text-[var(--primary)]">
-                R$ {work.price?.toFixed(2) ?? "0,00"}
-              </span>
+            <p className="text-sm text-muted-foreground mb-3">{limitarTexto(String(service.description), 30)}</p>
+            <div className="flex items-center gap-2 text-[var(--color-success)] font-bold text-lg">
+              <DollarSign className="w-5 h-5" />
+              <span>R$ {service.price?.toFixed(2) ?? "0,00"}</span>
             </div>
           </div>
         ))}
 
-        {filteredWorks.length === 0 && (
+        {filteredServices.length === 0 && (
           <div 
             className="
                 bg-white 
@@ -167,11 +166,11 @@ export default function WorksPage() {
         )}
       </div>
 
-      <WorkModal
+      <ServiceModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
-        onSave={loadWorks}
-        work={selectedWork}
+        onSave={loadServices}
+        service={selectedService}
       />
     </div>
   )

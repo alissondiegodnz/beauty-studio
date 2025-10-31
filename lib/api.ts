@@ -22,15 +22,26 @@ export const professionalsApi = {
   delete: (id: string) => api.delete(`/professionals/${id}`),
 }
 
-// Professionals API
-export const worksApi = {
-  getAll: () => api.get<Work[]>("/works"),
-  getAllStatus: () => api.get<Work[]>("/works/allStatus"),
-  getById: (id: string) => api.get<Work>(`/works/${id}`),
-  create: (data: Omit<Work, "id">) => api.post<Work>("/works", data),
-  update: (id: string, data: Partial<Work>) => api.put<Work>(`/works/${id}`, data),
-  delete: (id: string) => api.delete(`/works/${id}`),
+// Services API
+export const servicesApi = {
+  getAll: () => api.get<Work[]>("/services"),
+  getAllStatus: () => api.get<Work[]>("/services/allStatus"),
+  getById: (id: string) => api.get<Work>(`/services/${id}`),
+  create: (data: Omit<Work, "id">) => api.post<Work>("/services", data),
+  update: (id: string, data: Partial<Work>) => api.put<Work>(`/services/${id}`, data),
+  delete: (id: string) => api.delete(`/services/${id}`),
 }
+
+// Packages API
+export const packagesApi = {
+  getAll: () => api.get<Work[]>("/packages"),
+  getAllStatus: () => api.get<Work[]>("/packages/allStatus"),
+  getById: (id: string) => api.get<Work>(`/packages/${id}`),
+  create: (data: Omit<Work, "id">) => api.post<Work>("/packages", data),
+  update: (id: string, data: Partial<Work>) => api.put<Work>(`/packages/${id}`, data),
+  delete: (id: string) => api.delete(`/packages/${id}`),
+}
+
 
 // Appointments API
 export const appointmentsApi = {
@@ -42,13 +53,13 @@ export const appointmentsApi = {
   delete: (id: string) => api.delete(`/appointments/${id}`),
 }
 
-// Services API
-export const servicesApi = {
-  getAll: (params?: { startDate?: string; endDate?: string; category?: string; professionalId?: string }) => api.get<Service[]>("/services", { params }),
-  getById: (id: string) => api.get<Service>(`/services/${id}`),
-  create: (data: Omit<Service, "id">) => api.post<Service>("/services", data),
-  update: (id: string, data: Partial<Service>) => api.put<Service>(`/services/${id}`, data),
-  delete: (id: string) => api.delete(`/services/${id}`),
+// Payments API
+export const paymentsApi = {
+  getAll: (params?: { startDate?: string; endDate?: string; category?: string; professionalId?: string }) => api.get<Service[]>("/payments", { params }),
+  getById: (id: string) => api.get<Service>(`/payments/${id}`),
+  create: (data: Omit<Service, "id">) => api.post<Service>("/payments", data),
+  update: (id: string, data: Partial<Service>) => api.put<Service>(`/payments/${id}`, data),
+  delete: (id: string) => api.delete(`/payments/${id}`),
 }
 
 // Reports API
