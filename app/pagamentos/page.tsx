@@ -10,6 +10,7 @@ import { CategoryBadge } from "@/components/category-badge"
 import { servicesApi, professionalsApi, clientsApi } from "@/lib/api"
 import type { Service, Professional, Client } from "@/lib/types"
 import { ServiceModal } from "./service-modal"
+import Loading from "@/components/loading"
 
 function formatGmt3Date(offsetDays = 0) {
   const ms = Date.now() - 3 * 60 * 60 * 1000 + offsetDays * 24 * 60 * 60 * 1000
@@ -29,6 +30,7 @@ export default function PagamentosPage() {
     isOpen: false,
     service: null
   })
+  const [isLoading, setIsLoading] = useState(true)
 
   useEffect(() => {
     loadServices()
@@ -51,6 +53,7 @@ export default function PagamentosPage() {
   }, [])
 
   const loadServices = async () => {
+    setIsLoading(true)
     try {
       const params: any = {}
       if (startDate) params.startDate = startDate
@@ -62,6 +65,8 @@ export default function PagamentosPage() {
       setAllServices(response.data)
     } catch (error) {
       console.error("Error loading services:", error)
+    } finally {
+        setIsLoading(false)
     }
   }
 
@@ -99,6 +104,10 @@ export default function PagamentosPage() {
 
   const handleCloseModal = () => {
     setModalState({ isOpen: false, service: null })
+  }
+
+  if (isLoading) {
+    return <Loading />
   }
 
   return (

@@ -10,7 +10,8 @@ import { BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Toolti
 import { reportsApi, professionalsApi } from "@/lib/api"
 import type { Professional } from "@/lib/types"
 import type { ReportData } from "@/lib/types"
-import { startOfMonth, endOfMonth, format } from 'date-fns';
+import { startOfMonth, endOfMonth, format, set } from 'date-fns';
+import Loading from "@/components/loading"
 
 const COLORS = ["#e8c4c8", "#d4c5aa", "#ce9d5eff", "#d39b9fff"]
 
@@ -28,6 +29,7 @@ export default function RelatoriosPage() {
   const [selectedCategory, setSelectedCategory] = useState<string>("all")
   const [professionals, setProfessionals] = useState<Professional[]>([])
   const [selectedProfessional, setSelectedProfessional] = useState<string>("all")
+  const [isLoading, setIsLoading] = useState(true)
 
   useEffect(() => {
     console.log("startDate,endDate or category changed", startDate, endDate, selectedCategory)
@@ -44,6 +46,7 @@ export default function RelatoriosPage() {
   }, [selectedProfessional])
 
   const loadReportData = async () => {
+    setIsLoading(true)
     try {
       const params: any = { startDate, endDate }
       if (selectedCategory !== "all") params.category = selectedCategory
@@ -53,6 +56,8 @@ export default function RelatoriosPage() {
       setReportData(response.data)
     } catch (error) {
       console.error("Error loading report data:", error)
+    } finally {
+      setIsLoading(false)
     }
   }
 
@@ -65,8 +70,8 @@ export default function RelatoriosPage() {
     }
   }
 
-  if (!reportData) {
-    return <div>Carregando...</div>
+  if (isLoading) {
+      return <Loading />
   }
 
   return (

@@ -11,6 +11,7 @@ import { StatusBadge } from "@/components/status-badge"
 import { appointmentsApi, professionalsApi, clientsApi } from "@/lib/api"
 import type { Appointment, AppointmentStatus, Professional, Client } from "@/lib/types"
 import { AppointmentModal } from "./appointment-modal"
+import Loading from "@/components/loading"
 
 const tabs = ["Todos", "Agendados", "Confirmados", "Concluídos"]
 
@@ -32,6 +33,7 @@ export default function AgendamentosPage() {
   const [activeTab, setActiveTab] = useState("Todos")
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [editingAppointment, setEditingAppointment] = useState<Appointment | null>(null)
+  const [isLoading, setIsLoading] = useState(true)
 
   useEffect(() => {
     loadAppointments()
@@ -56,6 +58,7 @@ export default function AgendamentosPage() {
   }
 
   const loadAppointments = async () => {
+    setIsLoading(true);
     try {
       const params: any = {}
       if (startDate) params.startDate = startDate
@@ -67,6 +70,8 @@ export default function AgendamentosPage() {
       setAllAppointments(response.data)
     } catch (error) {
       console.error("Error loading appointments:", error)
+    } finally {
+      setIsLoading(false);
     }
   }
 
@@ -111,6 +116,10 @@ export default function AgendamentosPage() {
     setIsModalOpen(false)
     setEditingAppointment(null)
     loadAppointments()
+  }
+
+  if (isLoading) {
+      return <Loading />
   }
 
   return (

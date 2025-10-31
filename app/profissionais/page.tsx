@@ -10,23 +10,29 @@ import { StatusBadge } from "@/components/status-badge"
 import { professionalsApi } from "@/lib/api"
 import type { Professional } from "@/lib/types"
 import { ProfessionalModal } from "./professional-modal"
+import { set } from "date-fns"
+import Loading from "@/components/loading"
 
 export default function ProfissionaisPage() {
   const [professionals, setProfessionals] = useState<Professional[]>([])
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [editingProfessional, setEditingProfessional] = useState<Professional | null>(null)
   const [searchTerm, setSearchTerm] = useState("")
+  const [isLoading, setIsLoading] = useState(true)
 
   useEffect(() => {
     loadProfessionals()
   }, [])
 
   const loadProfessionals = async () => {
+    setIsLoading(true)
     try {
       const response = await professionalsApi.getAllStatus()
       setProfessionals(response.data)
     } catch (error) {
       console.error("Error loading professionals:", error)
+    } finally {
+      setIsLoading(false)
     }
   }
 
@@ -56,6 +62,10 @@ export default function ProfissionaisPage() {
     loadProfessionals()
   }
 
+  if (isLoading) {
+      return <Loading />
+  }
+  
   return (
     <div className="mx-auto max-w-7xl">
       <PageHeader

@@ -9,6 +9,7 @@ import { Label } from "@/components/ui/label"
 import { clientsApi } from "@/lib/api"
 import type { Client } from "@/lib/types"
 import { ClientModal } from "./client-modal"
+import Loading from "@/components/loading"
 
 export default function ClientesPage() {
   const [clients, setClients] = useState<Client[]>([])
@@ -19,12 +20,14 @@ export default function ClientesPage() {
   const [page, setPage] = useState(1)
   const perPage = 30
   const [totalCount, setTotalCount] = useState<number | null>(null)
+  const [isLoading, setIsLoading] = useState(true)
 
   useEffect(() => {
     loadClients(page, searchTerm)
   }, [page, searchTerm])
 
   const loadClients = async (pageParam = page, qParam = "") => {
+    setIsLoading(true)
     try {
       const response = await clientsApi.getPage(pageParam, perPage, qParam ? { q: qParam } : undefined)
       setClients(response.data)
@@ -43,6 +46,8 @@ export default function ClientesPage() {
       }
     } catch (error) {
       console.error("Error loading clients:", error)
+    } finally {
+      setIsLoading(false)
     }
   }
 
@@ -73,6 +78,10 @@ export default function ClientesPage() {
     setIsModalOpen(false)
     setEditingClient(null)
     loadClients(page, searchTerm)
+  }
+
+  if (isLoading) {
+      return <Loading />
   }
 
   return (
