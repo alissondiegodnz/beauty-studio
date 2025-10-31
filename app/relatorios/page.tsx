@@ -32,7 +32,6 @@ export default function RelatoriosPage() {
   const [isLoading, setIsLoading] = useState(true)
 
   useEffect(() => {
-    console.log("startDate,endDate or category changed", startDate, endDate, selectedCategory)
     loadReportData()
   }, [startDate, endDate, selectedCategory])
   
@@ -41,7 +40,6 @@ export default function RelatoriosPage() {
   }, [])
 
   useEffect(() => {
-    console.log("selectedProfessional changed:", selectedProfessional)
     loadReportData()
   }, [selectedProfessional])
 

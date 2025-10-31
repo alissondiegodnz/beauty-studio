@@ -4,7 +4,7 @@ export type AppointmentStatus = "Agendado" | "Confirmado" | "Concluído"
 
 export type PaymentMethod = "Dinheiro" | "Cartão de Crédito" | "Cartão de Débito" | "PIX"
 
-export type ProfessionalStatus = "Ativa" | "Inativo"
+export type ProfessionalStatus = "Ativo" | "Inativo"
 
 export interface Client {
   id: string
@@ -21,6 +21,15 @@ export interface Professional {
   phone: string
   status: ProfessionalStatus
   address: string
+}
+
+export interface Work {
+  id: string
+  name: string
+  category: Category
+  status: ProfessionalStatus
+  price?: number
+  description?: string
 }
 
 export interface Appointment {

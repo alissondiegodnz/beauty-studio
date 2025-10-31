@@ -1,5 +1,5 @@
 import api from "./axios"
-import type { Client, Professional, Appointment, Service, ReportData } from "./types"
+import type { Client, Professional, Appointment, Service, ReportData, Work } from "./types"
 
 // Clients API
 export const clientsApi = {
@@ -20,6 +20,16 @@ export const professionalsApi = {
   create: (data: Omit<Professional, "id">) => api.post<Professional>("/professionals", data),
   update: (id: string, data: Partial<Professional>) => api.put<Professional>(`/professionals/${id}`, data),
   delete: (id: string) => api.delete(`/professionals/${id}`),
+}
+
+// Professionals API
+export const worksApi = {
+  getAll: () => api.get<Work[]>("/works"),
+  getAllStatus: () => api.get<Work[]>("/works/allStatus"),
+  getById: (id: string) => api.get<Work>(`/works/${id}`),
+  create: (data: Omit<Work, "id">) => api.post<Work>("/works", data),
+  update: (id: string, data: Partial<Work>) => api.put<Work>(`/works/${id}`, data),
+  delete: (id: string) => api.delete(`/works/${id}`),
 }
 
 // Appointments API

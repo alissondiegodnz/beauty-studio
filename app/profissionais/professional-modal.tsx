@@ -23,7 +23,7 @@ export function ProfessionalModal({ isOpen, onClose, onSave, professional }: Pro
   const [formData, setFormData] = useState({
     name: "",
     phone: "",
-    status: "Ativa" as ProfessionalStatus | "",
+    status: "Ativo" as ProfessionalStatus | "",
     address: ""
   })
 
@@ -39,7 +39,7 @@ export function ProfessionalModal({ isOpen, onClose, onSave, professional }: Pro
       setFormData({
         name: "",
         phone: "",
-        status: "Ativa",
+        status: "Ativo",
         address: ""
       })
     }
@@ -129,7 +129,7 @@ export function ProfessionalModal({ isOpen, onClose, onSave, professional }: Pro
                   <SelectValue placeholder="Selecione o status" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="Ativa">Ativa</SelectItem>
+                  <SelectItem value="Ativo">Ativo</SelectItem>
                   <SelectItem value="Inativo">Inativo</SelectItem>
                 </SelectContent>
               </Select>

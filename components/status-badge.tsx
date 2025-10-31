@@ -10,7 +10,7 @@ const statusColors: Record<string, string> = {
   Agendado: "bg-blue-100 text-blue-700",
   Confirmado: "bg-green-100 text-green-700",
   Concluído: "bg-gray-100 text-gray-700",
-  Ativa: "bg-green-100 text-green-700",
+  Ativo: "bg-green-100 text-green-700",
   Inativo: "bg-gray-100 text-gray-700",
 }
 

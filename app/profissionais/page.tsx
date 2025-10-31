@@ -110,17 +110,14 @@ export default function ProfissionaisPage() {
                 <User className="w-6 h-6 text-white" />
               </div>
               <div className="flex gap-2">
+                <div className="flex gap-2">
+                  <StatusBadge status={professional.status} />
+                </div>
                 <button
                   onClick={() => handleEdit(professional)}
                   className="p-2 text-[var(--color-primary)] hover:bg-[var(--color-primary-light)] rounded-lg transition-colors"
                 >
                   <Pencil className="w-4 h-4" />
-                </button>
-                <button
-                  onClick={() => handleDelete(professional.id)}
-                  className="p-2 text-red-500 hover:bg-red-50 rounded-lg transition-colors"
-                >
-                  <Trash2 className="w-4 h-4" />
                 </button>
               </div>
             </div>
@@ -134,11 +131,6 @@ export default function ProfissionaisPage() {
                   <span>{professional.phone ? professional.phone : "-"}</span>
                 </div>
               </div>
-            </div>
-            
-            <div className="flex items-center gap-2 text-sm text-[var(--color-text-secondary)]">
-              <UserCheck className="w-4 h-4" />
-              <span>{professional.status}</span>
             </div>
 
           </div>

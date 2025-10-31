@@ -142,12 +142,6 @@ export default function ClientesPage() {
                 >
                   <Pencil className="w-4 h-4" />
                 </button>
-                <button
-                  onClick={() => handleDelete(client.id)}
-                  className="p-2 text-red-500 hover:bg-red-50 rounded-lg transition-colors"
-                >
-                  <Trash2 className="w-4 h-4" />
-                </button>
               </div>
             </div>
 
