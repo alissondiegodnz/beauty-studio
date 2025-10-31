@@ -1,15 +1,15 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { Plus, CalendarIcon, Tag, DollarSign, CreditCard, Clock, Pencil, Trash2, Package, UserCog, Users } from "lucide-react"
+import { Plus, CalendarIcon, Tag, DollarSign, CreditCard, Clock, Pencil, Trash2, Package, UserCog, Users, Phone } from "lucide-react"
 import { PageHeader } from "@/components/page-header"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { CategoryBadge } from "@/components/category-badge"
-import { servicesApi, professionalsApi, clientsApi } from "@/lib/api"
-import type { Service, Professional, Client } from "@/lib/types"
-import { ServiceModal } from "./service-modal"
+import { paymentsApi, professionalsApi, clientsApi } from "@/lib/api"
+import type { Payment, Professional, Client } from "@/lib/types"
+import { PaymentModal } from "./payment-modal"
 import Loading from "@/components/loading"
 
 function formatGmt3Date(offsetDays = 0) {
@@ -18,27 +18,27 @@ function formatGmt3Date(offsetDays = 0) {
 }
 
 export default function PagamentosPage() {
-  const [services, setServices] = useState<Service[]>([])
+  const [payments, setPayments] = useState<Payment[]>([])
   const [startDate, setStartDate] = useState(() => formatGmt3Date(-1))
   const [endDate, setEndDate] = useState(() => formatGmt3Date(0))
   const [selectedCategory, setSelectedCategory] = useState<string>("all")
   const [selectedProfessional, setSelectedProfessional] = useState<string>("all")
   const [clientSearchTerm, setClientSearchTerm] = useState("")
   const [professionals, setProfessionals] = useState<Professional[]>([])
-  const [allServices, setAllServices] = useState<Service[]>([])
-  const [modalState, setModalState] = useState<{ isOpen: boolean; service: Service | null }>({
+  const [allPayments, setAllPayments] = useState<Payment[]>([])
+  const [modalState, setModalState] = useState<{ isOpen: boolean; payment: Payment | null }>({
     isOpen: false,
-    service: null
+    payment: null
   })
   const [isLoading, setIsLoading] = useState(true)
 
   useEffect(() => {
-    loadServices()
+    loadPayments()
   }, [startDate, endDate, selectedCategory, selectedProfessional])
 
   useEffect(() => {
-    filterServices()
-  }, [allServices, clientSearchTerm])
+    filterPayments()
+  }, [allPayments, clientSearchTerm])
 
   useEffect(() => {
     const loadInitialData = async () => {
@@ -52,7 +52,7 @@ export default function PagamentosPage() {
     loadInitialData()
   }, [])
 
-  const loadServices = async () => {
+  const loadPayments = async () => {
     setIsLoading(true)
     try {
       const params: any = {}
@@ -61,63 +61,60 @@ export default function PagamentosPage() {
       if (selectedCategory !== "all") params.category = selectedCategory
       if (selectedProfessional !== "all") params.professionalId = selectedProfessional
 
-      const response = await servicesApi.getAll(params)
-      setAllServices(response.data)
+      const response = await paymentsApi.getAll(params)
+      setAllPayments(response.data)
     } catch (error) {
-      console.error("Error loading services:", error)
+      console.error("Error loading payments:", error)
     } finally {
         setIsLoading(false)
     }
   }
 
-  const filterServices = () => {
-    let filtered = allServices
+  const filterPayments = () => {
+    let filtered = allPayments
 
     if (clientSearchTerm) {
-      filtered = filtered.filter(service => 
-        service.clientName.toLowerCase().includes(clientSearchTerm.toLowerCase())
+      filtered = filtered.filter(payment => 
+        (payment.clientName.toLowerCase().includes(clientSearchTerm.toLowerCase()) || payment.clientPhone?.includes(clientSearchTerm))
       )
     }
 
-    setServices(filtered)
+    setPayments(filtered)
   }
 
-  const handleEdit = (service: Service) => {
-    setModalState({ isOpen: true, service })
+  const handleEdit = (payment: Payment) => {
+    setModalState({ isOpen: true, payment })
   }
 
   const handleDelete = async (id: string) => {
-    if (confirm("Deseja realmente excluir este serviço?")) {
+    if (confirm("Deseja realmente excluir este pagamento?")) {
       try {
-        await servicesApi.delete(id)
-        loadServices()
+        await paymentsApi.delete(id)
+        loadPayments()
       } catch (error) {
-        console.error("Error deleting service:", error)
+        console.error("Error deleting payment:", error)
       }
     }
   }
 
   const handleSave = () => {
-    setModalState({ isOpen: false, service: null })
-    loadServices()
+    setModalState({ isOpen: false, payment: null })
+    loadPayments()
   }
 
   const handleCloseModal = () => {
-    setModalState({ isOpen: false, service: null })
-  }
-
-  if (isLoading) {
-    return <Loading />
+    setModalState({ isOpen: false, payment: null })
   }
 
   return (
     <div className="mx-auto max-w-7xl">
+      {isLoading && <Loading />}
       <PageHeader
         title="Pagamentos"
         description="Registre os atendimentos realizados"
         action={
           <Button
-            onClick={() => { setModalState({ isOpen: true, service: null })}}
+            onClick={() => { setModalState({ isOpen: true, payment: null })}}
             className="bg-gradient-to-r from-[var(--gold-accent)] to-[var(--gold-medium)] hover:opacity-70"
           >
             <Plus className="w-4 h-4 mr-2" />
@@ -214,7 +211,7 @@ export default function PagamentosPage() {
             <DollarSign className="w-5 h-5" />
             <span className="text-sm opacity-90">Receita Total</span>
           </div>
-          <p className="text-3xl font-bold">R$ {services.reduce((sum, s) => sum + (s?.value || 0), 0).toFixed(2)}</p>
+          <p className="text-3xl font-bold">R$ {payments.reduce((sum, s) => sum + (s?.value || 0), 0).toFixed(2)}</p>
           <p className="text-xs opacity-75 mt-1">No período</p>
         </div>
 
@@ -223,29 +220,29 @@ export default function PagamentosPage() {
             <Package className="w-5 h-5" />
             <span className="text-sm">Total de Pagamentos</span>
           </div>
-          <p className="text-3xl font-bold text-[var(--color-primary)]">{services.length}</p>
+          <p className="text-3xl font-bold text-[var(--color-primary)]">{payments.length}</p>
           <p className="text-xs text-[var(--color-text-secondary)] mt-1">No período</p>
         </div>
       </div>
 
-      {/* Services Grid */}
+      {/* Payments Grid */}
       <div className="grid grid-cols-1 gap-4">
-        {services.map((service) => (
+        {payments.map((payment) => (
           <div
-            key={String(service.id)}
+            key={String(payment.id)}
             className="bg-white rounded-xl p-6 border border-[var(--color-border)] hover:shadow-lg transition-shadow"
           >
             <div className="flex items-start justify-between mb-4">
-              <CategoryBadge category={service.category} />
+              <CategoryBadge category={payment.category} />
               <div className="flex gap-2">
                 <button
-                  onClick={() => handleEdit(service)}
+                  onClick={() => handleEdit(payment)}
                   className="p-2 text-[var(--color-primary)] hover:bg-[var(--color-primary-light)] rounded-lg transition-colors"
                 >
                   <Pencil className="w-4 h-4" />
                 </button>
                 <button
-                  onClick={() => handleDelete(String(service.id))}
+                  onClick={() => handleDelete(String(payment.id))}
                   className="p-2 text-red-500 hover:bg-red-50 rounded-lg transition-colors"
                 >
                   <Trash2 className="w-4 h-4" />
@@ -257,35 +254,39 @@ export default function PagamentosPage() {
               <div className="space-y-2">
                 <div className="flex items-center gap-2 font-bold text-[var(--color-text-secondary)]">
                   <Users className="w-4 h-4 text-[var(--color-text-secondary)]" />
-                  <span className="font-semibold">{service.clientName}</span>
+                  <span className="font-semibold">{payment.clientName}</span>
+                </div>
+                <div className="flex items-center gap-2 font-bold text-[var(--color-text-secondary)]">
+                  <Phone className="w-4 h-4 text-[var(--color-text-secondary)]" />
+                  <span className="font-semibold">{`${payment.clientPhone ?? '-'}`}</span>
                 </div>
                 <div className="flex items-center gap-2 text-[var(--color-text-secondary)] text-sm">
                   <UserCog className="w-4 h-4" />
-                  <span>{service.professionalName}</span>
+                  <span>{payment.professionalName}</span>
                 </div>
                 <div className="flex items-center gap-2 text-[var(--color-text-secondary)] text-sm">
                   <CalendarIcon className="w-4 h-4" />
-                  <span>{new Date(`${service.date}T12:00:00`).toLocaleDateString("pt-BR")}</span>
+                  <span>{new Date(`${payment.date}T12:00:00`).toLocaleDateString("pt-BR")}</span>
                   <Clock className="w-4 h-4 ml-2" />
-                  <span>{service.time}</span>
+                  <span>{payment.time}</span>
                 </div>
               </div>
 
               <div className="space-y-2">
                 <div className="flex items-center gap-2 text-[var(--color-success)] font-bold text-lg">
                   <DollarSign className="w-5 h-5" />
-                  <span>R$ {service.value.toFixed(2)}</span>
+                  <span>R$ {payment.value.toFixed(2)}</span>
                 </div>
                 <div className="flex items-center gap-2 text-[var(--color-text-secondary)] text-sm">
                   <CreditCard className="w-4 h-4" />
-                  <span>{service.paymentMethod}</span>
+                  <span>{payment.paymentMethod}</span>
                 </div>
               </div>
             </div>
           </div>
         ))}
 
-        {services.length === 0 && (
+        {payments.length === 0 && (
           <div 
             className="
                 bg-white 
@@ -313,11 +314,11 @@ export default function PagamentosPage() {
         )}
       </div>
 
-      <ServiceModal
+      <PaymentModal
         isOpen={modalState.isOpen}
         onClose={handleCloseModal}
         onSave={handleSave}
-        service={modalState.service}
+        payment={modalState.payment}
       />
     </div>
   )

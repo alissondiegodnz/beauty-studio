@@ -1,5 +1,5 @@
 import api from "./axios"
-import type { Client, Professional, Appointment, Service, ReportData, Work } from "./types"
+import type { Client, Professional, Appointment, Payment, ReportData, Service, Package } from "./types"
 
 // Clients API
 export const clientsApi = {
@@ -24,21 +24,21 @@ export const professionalsApi = {
 
 // Services API
 export const servicesApi = {
-  getAll: () => api.get<Work[]>("/services"),
-  getAllStatus: () => api.get<Work[]>("/services/allStatus"),
-  getById: (id: string) => api.get<Work>(`/services/${id}`),
-  create: (data: Omit<Work, "id">) => api.post<Work>("/services", data),
-  update: (id: string, data: Partial<Work>) => api.put<Work>(`/services/${id}`, data),
+  getAll: () => api.get<Service[]>("/services"),
+  getAllStatus: () => api.get<Service[]>("/services/allStatus"),
+  getById: (id: string) => api.get<Service>(`/services/${id}`),
+  create: (data: Omit<Service, "id">) => api.post<Service>("/services", data),
+  update: (id: string, data: Partial<Service>) => api.put<Service>(`/services/${id}`, data),
   delete: (id: string) => api.delete(`/services/${id}`),
 }
 
 // Packages API
 export const packagesApi = {
-  getAll: () => api.get<Work[]>("/packages"),
-  getAllStatus: () => api.get<Work[]>("/packages/allStatus"),
-  getById: (id: string) => api.get<Work>(`/packages/${id}`),
-  create: (data: Omit<Work, "id">) => api.post<Work>("/packages", data),
-  update: (id: string, data: Partial<Work>) => api.put<Work>(`/packages/${id}`, data),
+  getAll: () => api.get<Package[]>("/packages"),
+  getAllStatus: () => api.get<Package[]>("/packages/allStatus"),
+  getById: (id: string) => api.get<Package>(`/packages/${id}`),
+  create: (data: Omit<Package, "id">) => api.post<Package>("/packages", data),
+  update: (id: string, data: Partial<Package>) => api.put<Package>(`/packages/${id}`, data),
   delete: (id: string) => api.delete(`/packages/${id}`),
 }
 
@@ -55,10 +55,10 @@ export const appointmentsApi = {
 
 // Payments API
 export const paymentsApi = {
-  getAll: (params?: { startDate?: string; endDate?: string; category?: string; professionalId?: string }) => api.get<Service[]>("/payments", { params }),
-  getById: (id: string) => api.get<Service>(`/payments/${id}`),
-  create: (data: Omit<Service, "id">) => api.post<Service>("/payments", data),
-  update: (id: string, data: Partial<Service>) => api.put<Service>(`/payments/${id}`, data),
+  getAll: (params?: { startDate?: string; endDate?: string; category?: string; professionalId?: string }) => api.get<Payment[]>("/payments", { params }),
+  getById: (id: string) => api.get<Payment>(`/payments/${id}`),
+  create: (data: Omit<Payment, "id">) => api.post<Payment>("/payments", data),
+  update: (id: string, data: Partial<Payment>) => api.put<Payment>(`/payments/${id}`, data),
   delete: (id: string) => api.delete(`/payments/${id}`),
 }
 

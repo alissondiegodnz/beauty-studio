@@ -1,6 +1,9 @@
 export default function Loading() {
   return (
-    <div className="flex items-center justify-center min-h-screen">
+    // Remoção das classes de fundo (bg-white/10 e backdrop-blur-sm)
+    <div 
+      className="fixed inset-0 z-50 flex items-center justify-center transition-opacity duration-300"
+    >
       <div className="flex flex-col items-center gap-6">
         <div className="flex gap-2">
           <div className="w-4 h-4 bg-[#D6AAAB] rounded-full animate-bounce" style={{ animationDelay: '0s' }}></div>

@@ -44,9 +44,9 @@ export interface Payment {
   clientId: string
   clientName: string
   clientPhone: string
-  professionalId: string
-  professionalName: string
   paymentMethod: PaymentMethod
+  value: number
+  isPartialValue: boolean
   date: string
   time: string
   description?: string
@@ -62,6 +62,7 @@ export interface ServiceLine {
   serviceName: string
   value: number
   professionalId: string
+  professionalName: string
   isPackageService?: boolean
 }
 
