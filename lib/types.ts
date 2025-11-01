@@ -100,10 +100,10 @@ export interface Package {
 export interface ReportData {
   todayRevenue: number
   totalRevenue: number
-  averagePayment: number
+  totalPayments: number
   totalServices: number
   dailyRevenue: { date: string; value: number }[]
   revenueByCategory: { category: Category; value: number; percentage: number }[]
-  revenueByProfessional: { name: string; services: number; total: number }[]
+  revenueByProfessional: { name: string; services: number; payments: number; total: number }[]
   paymentMethods: { method: PaymentMethod; value: number }[]
 }

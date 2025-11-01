@@ -54,6 +54,16 @@ export default function RelatoriosPage() {
       setReportData(response.data)
     } catch (error) {
       console.error("Error loading report data:", error)
+      setReportData({
+        todayRevenue: 0,
+        totalRevenue: 0,
+        totalPayments: 0,
+        totalServices: 0,
+        dailyRevenue: [],
+        revenueByCategory: [],
+        paymentMethods: [],
+        revenueByProfessional: []
+      })
     } finally {
       setIsLoading(false)
     }
@@ -154,17 +164,17 @@ export default function RelatoriosPage() {
 
         <div className="bg-white rounded-xl p-6 border border-[var(--color-border)]">
           <div className="flex items-center gap-2 mb-2 text-[var(--color-text-secondary)]">
-            <Receipt className="w-5 h-5" />
-            <span className="text-sm">Receita Média por Serviço</span>
+            <Package className="w-5 h-5" />
+            <span className="text-sm">Total de Pagamentos</span>
           </div>
-          <p className="text-3xl font-bold text-[var(--color-primary)]">R$ {reportData.averagePayment.toFixed(2)}</p>
-          <p className="text-xs text-[var(--color-text-secondary)] mt-1">Média no período</p>
+          <p className="text-3xl font-bold text-[var(--color-primary)]">{reportData.totalPayments}</p>
+          <p className="text-xs text-[var(--color-text-secondary)] mt-1">No período</p>
         </div>
 
         <div className="bg-white rounded-xl p-6 border border-[var(--color-border)]">
           <div className="flex items-center gap-2 mb-2 text-[var(--color-text-secondary)]">
             <Package className="w-5 h-5" />
-            <span className="text-sm">Total de Pagamentos</span>
+            <span className="text-sm">Total de Serviços</span>
           </div>
           <p className="text-3xl font-bold text-[var(--color-primary)]">{reportData.totalServices}</p>
           <p className="text-xs text-[var(--color-text-secondary)] mt-1">No período</p>
@@ -249,8 +259,15 @@ export default function RelatoriosPage() {
                     {professional.name.charAt(0)}
                   </div>
                   <div>
-                    <p className="font-medium text-[var(--color-text-primary)]">{professional.name}</p>
-                    <p className="text-sm text-[var(--color-text-secondary)]">{professional.services} serviços</p>
+                    <p className="font-medium mb-3 text-[var(--color-text-primary)]">{professional.name}</p>
+                    <div className="flex items-center gap-2 mb-1">
+                      <Scissors className="w-4 h-4" />
+                      <span className="text-base font-semibold text-[var(--color-primary)] opacity-90">{professional.services} Serviços feitos</span>
+                    </div>
+                    <div className="flex items-center gap-2 mb-1">
+                      <DollarSign className="w-4 h-4" />
+                      <span className="text-base text-[var(--color-success)] opacity-90">Participa de {professional.payments} Pagamentos</span>
+                    </div>
                   </div>
                 </div>
                 <div className="text-right">
