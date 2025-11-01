@@ -12,6 +12,7 @@ import { ServiceModal } from "./service-modal"
 import { CategoryBadge } from "@/components/category-badge"
 import { StatusBadge } from "@/components/status-badge"
 import Loading from "@/components/loading"
+import { limitarTexto } from "@/lib/utils";
 
 export default function ServicesPage() {
   const [services, setServices] = useState<Service[]>([])
@@ -20,13 +21,6 @@ export default function ServicesPage() {
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [selectedService, setSelectedService] = useState<Service | null>(null)
   const [isLoading, setIsLoading] = useState(true)
-
-  const limitarTexto = (texto: string, limite: number): string => {
-    if (texto.length > limite) {
-        return texto.substring(0, limite) + '...';
-    }
-    return texto;
-  };
 
   const loadServices = async () => {
     setIsLoading(true)
@@ -138,7 +132,7 @@ export default function ServicesPage() {
               <h3 className="text-lg font-semibold">{service.name}</h3>
 
             </div>
-            <p className="text-sm text-muted-foreground mb-3">{limitarTexto(String(service.description), 30)}</p>
+            <p className="text-sm text-muted-foreground mb-3">{limitarTexto({texto: String(service.description) ?? "", limite: 30})}</p>
             <div className="flex items-center gap-2 text-[var(--color-success)] font-bold text-lg">
               <DollarSign className="w-5 h-5" />
               <span>R$ {service.price?.toFixed(2) ?? "0,00"}</span>

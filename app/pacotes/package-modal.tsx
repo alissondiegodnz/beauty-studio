@@ -59,8 +59,7 @@ export function PackageModal({ isOpen, onClose, onSave, packageToEdit }: Package
           services: packageToEdit.services.map(s => ({
             id: s.id,
             name: s.name,
-            price: s.price ?? 0,
-            quantity: s.quantity
+            price: s.price ?? 0
           })) 
         })
       } else {
@@ -72,7 +71,7 @@ export function PackageModal({ isOpen, onClose, onSave, packageToEdit }: Package
   // --- Funções da Grid de Serviços do Pacote ---
   const handleAddService = (serviceIdToAdd: string) => {
     const service = availableServices.find(s => s.id === serviceIdToAdd)
-    if (service && !formData.services.some(s => s.id === serviceIdToAdd)) { // Evita duplicados
+    if (service && !formData.services.some(s => s.id === serviceIdToAdd)) {
       const newService: PackageService = {
         id: service.id,
         name: service.name,
@@ -104,12 +103,11 @@ export function PackageModal({ isOpen, onClose, onSave, packageToEdit }: Package
     }
   
 
-  // Calcula o valor total avulso dos serviços
   const totalServicesValue = useMemo(() => {
     return formData.services.reduce((sum, service) => sum + service.price, 0)
   }, [formData.services])
 
-  // Serviços já adicionados no pacote
+
   const serviceIdsInPackage = formData.services.map(s => s.id)
   const availableServicesToAdd = availableServices.filter(s => !serviceIdsInPackage.includes(s.id))
 
@@ -201,6 +199,7 @@ export function PackageModal({ isOpen, onClose, onSave, packageToEdit }: Package
                     </SelectContent>
                 </Select>
           </div>
+          
             {/* Preço Fixo do Pacote
             <div>
               <Label htmlFor="packagePrice" className="mb-2">Preço do Pacote (R$) *</Label>

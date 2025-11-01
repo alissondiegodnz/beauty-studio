@@ -11,7 +11,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Textarea } from "@/components/ui/textarea"
 
 import { paymentsApi, clientsApi, professionalsApi, servicesApi, packagesApi } from "@/lib/api" 
-import type { Payment, Client, Professional, Category, PaymentMethod, ServiceType, Package, ServiceLine, Service } from "@/lib/types"
+import type { Payment, Client, Professional, Category, PaymentMethod, ServiceType, Package, ServiceLine, Service, PaymentLine } from "@/lib/types"
 
 interface PaymentModalProps {
   isOpen: boolean
@@ -26,12 +26,21 @@ export function PaymentModal({ isOpen, onClose, onSave, payment }: PaymentModalP
   const [availableServices, setAvailableServices] = useState<Service[]>([])
   const [availablePackages, setAvailablePackages] = useState<Package[]>([])
   const [selectedServiceId, setSelectedServiceId] = useState<string>("")
-  const [errors, setErrors] = useState<{ clientId?: string; paymentMethod?: string; totalValue?: string }>({})
+
+  const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<PaymentMethod>("");
+  const [errors, setErrors] = useState<{ clientId?: string; totalValue?: string, totalPayment?: string }>({})
   const [isInitialLoad, setIsInitialLoad] = useState(true)
+  
+  const AVAILABLE_PAYMENT_METHODS: PaymentMethod[] = [
+    "Dinheiro" as PaymentMethod,
+    "Cartão de Crédito" as PaymentMethod,
+    "Cartão de Débito" as PaymentMethod,
+    "PIX" as PaymentMethod,
+    "Transferência" as PaymentMethod
+];
   
   const getInitialFormData = () => ({
     clientId: "",
-    paymentMethod: "" as PaymentMethod,
     value: 0,
     isPartialValue: false,
     date: new Date().toISOString().substring(0, 10),
@@ -40,7 +49,8 @@ export function PaymentModal({ isOpen, onClose, onSave, payment }: PaymentModalP
     serviceType: "" as ServiceType,
     packageId: "",
     packageName: "",
-    serviceLines: [] as ServiceLine[]
+    serviceLines: [] as ServiceLine[],
+    paymentLines: [] as PaymentLine[]
   })
 
   const [formData, setFormData] = useState(getInitialFormData)
@@ -76,7 +86,6 @@ export function PaymentModal({ isOpen, onClose, onSave, payment }: PaymentModalP
         setFormData(
           {
             clientId: payment.clientId,
-            paymentMethod: payment.paymentMethod as PaymentMethod,
             value: payment.value,
             isPartialValue: payment.isPartialValue,
             date: payment.date,
@@ -85,7 +94,8 @@ export function PaymentModal({ isOpen, onClose, onSave, payment }: PaymentModalP
             serviceType: payment.serviceType as ServiceType,
             packageId: payment.packageId || "",
             packageName: payment.packageName || "",
-            serviceLines: payment.serviceLines || []
+            serviceLines: payment.serviceLines || [],
+            paymentLines: payment.paymentLines || []
           })
       } else {
         setFormData(getInitialFormData())
@@ -166,6 +176,54 @@ export function PaymentModal({ isOpen, onClose, onSave, payment }: PaymentModalP
       serviceLines: prev.serviceLines.filter(line => line.id !== lineId)
     }))
   }
+
+  const totalServiceValue = useMemo(() => {
+    return formData.serviceLines.reduce((sum, line) => {
+      const value = typeof line.value === "string" ? parseFloat(line.value) || 0 : line.value || 0  
+      return sum + value
+    }, 0)
+  }, [formData.serviceLines])
+
+  const totalPaidValue = useMemo(() => {
+      return formData.paymentLines.reduce((sum, line) => {
+          const value = typeof line.value === "string" ? parseFloat(line.value) || 0 : line.value || 0  
+          return sum + value
+      }, 0)
+  }, [formData.paymentLines])
+
+  const handleAddPaymentLine = (method: PaymentMethod) => {
+      const alreadyAdded = formData.paymentLines.some(line => line.paymentMethod === method);
+      if (alreadyAdded || !method) return;
+
+      const newLine: PaymentLine = {
+          id: crypto.randomUUID(),
+          paymentMethod: method,
+          value: 0,
+      };
+
+      setFormData(prev => ({
+          ...prev,
+          paymentLines: [...prev.paymentLines, newLine]
+      }));
+      
+      setSelectedPaymentMethod("");
+  };
+
+  const handleUpdatePaymentLine = (lineId: string, field: keyof PaymentLine, value: string) => {
+      setFormData(prev => ({
+          ...prev,
+          paymentLines: prev.paymentLines.map(line => 
+              line.id === lineId ? { ...line, [field]: value } : line
+          )
+      }));
+  };
+
+  const handleRemovePaymentLine = (lineId: string) => {
+      setFormData(prev => ({
+          ...prev,
+          paymentLines: prev.paymentLines.filter(line => line.id !== lineId)
+      }));
+  };
   
   const totalValue = useMemo(() => {
     return formData.serviceLines.reduce((sum, line) => {
@@ -175,9 +233,7 @@ export function PaymentModal({ isOpen, onClose, onSave, payment }: PaymentModalP
   }, [formData.serviceLines])
 
 
-  // --- Componente de Busca de Cliente (Mantido do original) ---
   function ClientSearch({ clients, value, onChange, placeholder, required }: { clients: Client[], value: string, onChange: (id: string, display: string) => void, placeholder?: string, required?: boolean }) {
-    // ... CÓDIGO ClientSearch (Mantido do original)
     const [query, setQuery] = useState("")
     const [open, setOpen] = useState(false)
     const ref = useRef<HTMLDivElement | null>(null)
@@ -300,21 +356,26 @@ export function PaymentModal({ isOpen, onClose, onSave, payment }: PaymentModalP
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
 
-    const newErrors: { clientId?: string; paymentMethod?: string; totalValue?: string } = {}
+    const newErrors: { clientId?: string; totalValue?: string; totalPayment?: string } = {}
     if (!formData.clientId) newErrors.clientId = 'Selecione um cliente'
-    if (!formData.paymentMethod) newErrors.paymentMethod = 'Selecione o método de pagamento'
     
     // Validação da grid de serviços
     if (formData.serviceLines.length === 0) {
         newErrors.totalValue = 'É necessário adicionar pelo menos um serviço ou pacote.'
     } else if (formData.serviceLines.some(line => !line.professionalId)) {
         newErrors.totalValue = 'Todos os serviços devem ter um profissional selecionado.'
-    } else if (parseFloat(totalValue) < 1) {
-        newErrors.totalValue = 'O valor total deve ser no mínimo R$ 1,00.'
+    } else if (totalServiceValue < 1) {
+        newErrors.totalValue = 'O valor total dos serviços deve ser no mínimo R$ 1,00.'
+    }
+
+    if (formData.paymentLines.length === 0) {
+        newErrors.totalPayment = 'Selecione pelo menos um método de pagamento.'
+    } else if (Math.abs(totalServiceValue - totalPaidValue) > 0.01) {
+        newErrors.totalPayment = `O valor total pago (R$ ${totalPaidValue.toFixed(2)}) não corresponde ao valor dos serviços (R$ ${totalServiceValue.toFixed(2)}).`
     }
 
     if (Object.keys(newErrors).length > 0) {
-      setErrors(newErrors)
+      setErrors(newErrors as any)
       return
     }
 
@@ -478,7 +539,7 @@ export function PaymentModal({ isOpen, onClose, onSave, payment }: PaymentModalP
           </div>
 
           {/* GRID DE SERVIÇOS (Aparece se houverem linhas) */}
-          {formData.serviceLines.length > 0 && (
+          {(
             <div className="border rounded-md overflow-hidden">
               <table className="min-w-full divide-y divide-gray-200">
                 <thead className="bg-gray-50">
@@ -531,7 +592,7 @@ export function PaymentModal({ isOpen, onClose, onSave, payment }: PaymentModalP
                       
                       {/* Coluna 4: Remover */}
                       <td className="px-3 py-2 whitespace-nowrap text-right text-sm font-medium">
-                        {!line.isPackageService && ( // Permite remover apenas serviços avulsos
+                        {!line.isPackageService && (
                           <Button 
                             type="button" 
                             variant="ghost" 
@@ -562,31 +623,87 @@ export function PaymentModal({ isOpen, onClose, onSave, payment }: PaymentModalP
           )}
 
           {/* CAMPOS DE PAGAMENTO E DESCRIÇÃO */}
-          <div className="grid grid-cols-2 gap-4 border-t pt-4">
-            
-            <div>
-              <Label htmlFor="paymentMethod" className="mb-2">Método de Pagamento *</Label>
-              <Select
-                value={formData.paymentMethod}
-                onValueChange={(value) => {
-                  setFormData({ ...formData, paymentMethod: value as PaymentMethod })
-                  setErrors((prev) => ({ ...prev, paymentMethod: undefined }))
-                }}
-                required
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Selecione o método" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="Dinheiro">Dinheiro</SelectItem>
-                  <SelectItem value="Cartão de Crédito">Cartão de Crédito</SelectItem>
-                  <SelectItem value="Cartão de Débito">Cartão de Débito</SelectItem>
-                  <SelectItem value="PIX">PIX</SelectItem>
-                </SelectContent>
-              </Select>
-              {errors.paymentMethod && <p className="text-xs text-[var(--destructive)] mt-1">{errors.paymentMethod}</p>}
+          <div className="grid grid-cols-1 gap-4 border-t pt-4">
+            <div className="flex items-end gap-2">
+              <div className="flex-grow">
+                <Label htmlFor="addPaymentMethod" className="mb-2">Adicionar Método de Pagamento *</Label>
+                <Select
+                  value={selectedPaymentMethod} 
+                  onValueChange={(value) => {
+                    handleAddPaymentLine(value as PaymentMethod);
+                    setSelectedPaymentMethod(""); 
+                  }}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Selecione o método" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {AVAILABLE_PAYMENT_METHODS
+                        .filter(method => !formData.paymentLines.some(line => line.paymentMethod === method))
+                        .map((method) => (
+                        <SelectItem key={method} value={method}>
+                          {method}
+                        </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
             </div>
-          
+
+            {/* 🆕 NOVO: Grid de Pagamentos */}
+            {formData.paymentLines.length > 0 && (
+                <div className="border rounded-md overflow-hidden">
+                    <table className="min-w-full divide-y divide-gray-200">
+                        <thead className="bg-gray-50">
+                            <tr>
+                                <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase w-3/5">Método</th>
+                                <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase w-1/5">Valor Pago (R$)</th>
+                                <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase w-1/12"></th>
+                            </tr>
+                        </thead>
+                        <tbody className="bg-white divide-y divide-gray-200">
+                            {formData.paymentLines.map((line) => (
+                                <tr key={line.id}>
+                                    <td className="px-3 py-2 whitespace-nowrap text-sm text-gray-900">
+                                        {line.paymentMethod}
+                                    </td>
+                                    <td className="px-3 py-2 whitespace-nowrap text-sm">
+                                        <Input
+                                            type="number"
+                                            step="1.00"
+                                            value={line.value}
+                                            onChange={(e) => handleUpdatePaymentLine(line.id, 'value', e.target.value)}
+                                            className="w-full text-right h-8"
+                                            required
+                                        />
+                                    </td>
+                                    <td className="px-3 py-2 whitespace-nowrap text-right text-sm font-medium">
+                                        <Button 
+                                            type="button" 
+                                            variant="ghost" 
+                                            size="icon" 
+                                            onClick={() => handleRemovePaymentLine(line.id)}
+                                            className="h-8 w-8 text-red-500 hover:bg-red-50"
+                                        >
+                                            <Trash2 className="w-4 h-4" />
+                                        </Button>
+                                    </td>
+                                </tr>
+                            ))}
+                            {/* Linha de Total Pago e Serviço */}
+                            <tr className="bg-gray-50/50">
+                                <td className="px-3 py-2 font-bold text-base text-gray-700">
+                                    Total Pago / Total Serviço
+                                </td>
+                                <td className="px-3 py-2 font-bold text-base text-right" colSpan={2}>
+                                    R$ {totalPaidValue.toFixed(2)} / R$ {totalServiceValue.toFixed(2)}
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            )}
+            {errors.totalPayment && <p className="text-xs text-[var(--destructive)] mt-1">{errors.totalPayment}</p>}
           </div>
           
           <div>

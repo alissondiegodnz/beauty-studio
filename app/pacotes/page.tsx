@@ -9,7 +9,8 @@ import { Input } from "@/components/ui/input"
 import { packagesApi } from "@/lib/api"
 import type { Package } from "@/lib/types" 
 import { PackageModal } from "./package-modal" 
-import Loading from "@/components/loading" // Mantido por referência
+import Loading from "@/components/loading"
+import { limitarTexto } from "@/lib/utils";
 
 export default function PackagesPage() {
   const [packages, setPackages] = useState<Package[]>([])
@@ -173,7 +174,7 @@ export default function PackagesPage() {
 
               <div className="space-y-2 text-sm text-[var(--color-text-secondary)]">
                 <p className="font-medium">Descrição:</p>
-                <p>{pkg.description || 'Nenhuma descrição fornecida.'}</p>
+                <p>{limitarTexto({texto: pkg.description ?? "", limite: 25}) || 'Nenhuma descrição fornecida.'}</p>
               </div>
             </div>
           </div>

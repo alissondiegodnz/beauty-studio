@@ -2,7 +2,7 @@ export type Category = "Salão" | "Estética" | "Bronze" | "Loja de roupas"
 
 export type AppointmentStatus = "Agendado" | "Confirmado" | "Concluído"
 
-export type PaymentMethod = "Dinheiro" | "Cartão de Crédito" | "Cartão de Débito" | "PIX"
+export type PaymentMethod = "Dinheiro" | "Cartão de Crédito" | "Cartão de Débito" | "PIX" | "Transferência" | ""
 
 export type ProfessionalStatus = "Ativo" | "Inativo"
 
@@ -44,7 +44,6 @@ export interface Payment {
   clientId: string
   clientName: string
   clientPhone: string
-  paymentMethod: PaymentMethod
   value: number
   isPartialValue: boolean
   date: string
@@ -54,6 +53,7 @@ export interface Payment {
   packageId?: string
   packageName?: string
   serviceLines?: ServiceLine[]
+  paymentLines: PaymentLine[]
 }
 
 export interface ServiceLine {
@@ -65,6 +65,12 @@ export interface ServiceLine {
   professionalId: string
   professionalName: string
   isPackageService?: boolean
+}
+
+export interface PaymentLine {
+  id: string
+  paymentMethod: PaymentMethod
+  value: number
 }
 
 export interface Service {
@@ -80,7 +86,6 @@ export interface PackageService {
   id: string;
   name: string;
   price: number;
-  quantity: number;
 }
 
 export interface Package {

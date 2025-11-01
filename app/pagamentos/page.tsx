@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { CategoryBadge } from "@/components/category-badge"
 import { paymentsApi, professionalsApi, clientsApi } from "@/lib/api"
-import type { Payment, Professional, Client, Category } from "@/lib/types"
+import type { Payment, Professional, Client, Category, PaymentMethod } from "@/lib/types"
 import { PaymentModal } from "./payment-modal"
 import Loading from "@/components/loading"
 import { CategoryBadgeList } from "@/components/category-badge-list"
@@ -284,12 +284,15 @@ export default function PagamentosPage() {
                   <DollarSign className="w-5 h-5" />
                   <span>R$ {payment.value.toFixed(2)}</span>
                 </div>
-                {payment.isPartialValue && <p className="text-sm text-[var(--color-text-secondary)]">
-                    * Valor parcial com base nos filtros informados
+                {payment.isPartialValue && <p className="text-sm font-semibold text-[var(--destructive)]">
+                    * Valor parcial calculado a partir dos filtros informados
                 </p>}
                 <div className="flex items-center gap-2 text-[var(--color-text-secondary)] text-sm">
                   <CreditCard className="w-4 h-4" />
-                  <span>{payment.paymentMethod}</span>
+                  <span>{Array.from(new Set(
+                    payment.paymentLines?.map((method) => method?.paymentMethod)
+                      .filter((name): name is PaymentMethod => name !== undefined && name !== null)
+                  )).join(", ")}</span>
                 </div>
               </div>
             </div>
