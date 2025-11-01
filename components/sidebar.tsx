@@ -2,7 +2,7 @@
 
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { Calendar, CreditCard, Users, UserCog, BarChart3, Sparkles, Scissors } from "lucide-react"
+import { Calendar, CreditCard, Users, UserCog, BarChart3, Sparkles, Scissors, Package } from "lucide-react"
 import { cn } from "@/lib/utils"
 import Image from "next/image" 
 import logoImage from "@/public/logo.png"
@@ -12,7 +12,8 @@ const menuItems = [
   { href: "/pagamentos", label: "Pagamentos", icon: CreditCard },
   { href: "/clientes", label: "Clientes", icon: Users },
   { href: "/profissionais", label: "Profissionais", icon: UserCog },
-  { href: "/servicos", label: "Serviços e Pacotes", icon: Scissors },
+  { href: "/servicos", label: "Serviços", icon: Scissors },
+  { href: "/pacotes", label: "Pacotes de Serviços", icon: Package },
   { href: "/relatorios", label: "Relatórios", icon: BarChart3 },
 ]
 

@@ -75,9 +75,18 @@ export interface Service {
   description?: string
 }
 
+export interface PackageService {
+  id: string;
+  name: string;
+  price: number;
+}
+
 export interface Package {
   id: string
   name: string
+  status: string
+  description?: string
+  calculatedPrice?: number
   services: Service[]
 }
 
