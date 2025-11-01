@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { DollarSign, TrendingUp, Receipt, Package, CalendarIcon, TagIcon, User } from "lucide-react"
+import { DollarSign, TrendingUp, Receipt, Package, CalendarIcon, TagIcon, User, Scissors } from "lucide-react"
 import { PageHeader } from "@/components/page-header"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
