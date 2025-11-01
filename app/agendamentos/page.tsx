@@ -118,12 +118,9 @@ export default function AgendamentosPage() {
     loadAppointments()
   }
 
-  if (isLoading) {
-      return <Loading />
-  }
-
   return (
-    <div className="mx-auto max-w-7xl"> 
+    <div className="relative mx-auto max-w-7xl"> 
+      {isLoading && <Loading />}
       <PageHeader
         title="Agendamentos"
         description="Gerencie os agendamentos dos clientes"

@@ -80,12 +80,9 @@ export default function ClientesPage() {
     loadClients(page, searchTerm)
   }
 
-  if (isLoading) {
-      return <Loading />
-  }
-
   return (
-    <div className="mx-auto max-w-7xl">
+    <div className="relative mx-auto max-w-7xl">
+      {isLoading && <Loading />}
       <PageHeader
         title="Clientes"
         description="Gerencie o cadastro de clientes"

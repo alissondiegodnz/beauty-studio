@@ -2,7 +2,7 @@ export default function Loading() {
   return (
     // Remoção das classes de fundo (bg-white/10 e backdrop-blur-sm)
     <div 
-      className="fixed inset-0 z-50 flex items-center justify-center transition-opacity duration-300"
+      className="absolute inset-0 z-50 flex items-center justify-center transition-opacity duration-300"
     >
       <div className="flex flex-col items-center gap-6">
         <div className="flex gap-2">

@@ -159,8 +159,8 @@ export function AppointmentModal({ isOpen, onClose, onSave, appointment }: Appoi
     professionalId: "",
     category: "" as Category | "",
     status: "" as AppointmentStatus | "",
-    date: "",
-    time: "",
+    date: new Date().toISOString().substring(0, 10),
+    time: new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit', hour12: false }),
     service: "",
     observations: "",
   })

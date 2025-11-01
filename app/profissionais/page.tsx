@@ -61,13 +61,10 @@ export default function ProfissionaisPage() {
     setEditingProfessional(null)
     loadProfessionals()
   }
-
-  if (isLoading) {
-      return <Loading />
-  }
   
   return (
-    <div className="mx-auto max-w-7xl">
+    <div className="relative mx-auto max-w-7xl">
+      {isLoading && <Loading />}
       <PageHeader
         title="Profissionais"
         description="Gerencie o cadastro de profissionais"

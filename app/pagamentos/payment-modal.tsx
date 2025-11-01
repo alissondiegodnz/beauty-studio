@@ -27,14 +27,15 @@ export function PaymentModal({ isOpen, onClose, onSave, payment }: PaymentModalP
   const [availablePackages, setAvailablePackages] = useState<Package[]>([])
   const [selectedServiceId, setSelectedServiceId] = useState<string>("")
   const [errors, setErrors] = useState<{ clientId?: string; paymentMethod?: string; totalValue?: string }>({})
+  const [isInitialLoad, setIsInitialLoad] = useState(true)
   
   const getInitialFormData = () => ({
     clientId: "",
     paymentMethod: "" as PaymentMethod,
     value: 0,
     isPartialValue: false,
-    date: new Date().toISOString().substring(0, 10), // Data atual
-    time: new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit', hour12: false }), // Hora atual
+    date: new Date().toISOString().substring(0, 10),
+    time: new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit', hour12: false }),
     description: "",
     serviceType: "" as ServiceType,
     packageId: "",
@@ -55,8 +56,7 @@ export function PaymentModal({ isOpen, onClose, onSave, payment }: PaymentModalP
       
       setClients(clientsRes.data)
       setProfessionals(professionalsRes.data)
-      console.log("Serviços disponíveis:", servicesRes.data)
-      setAvailableServices(servicesRes.data) // .map((s: any) => ({ id: s.id, name: s.name, price: s.value }))) // Mapeando para o tipo DetailedService
+      setAvailableServices(servicesRes.data)
       setAvailablePackages(packagesRes.data)
       
     } catch (error) {
@@ -70,6 +70,7 @@ export function PaymentModal({ isOpen, onClose, onSave, payment }: PaymentModalP
       return
     }
 
+    if (payment) setIsInitialLoad(true)
     loadInitialData().then(() => {
       if (payment) {
         setFormData(
@@ -88,12 +89,21 @@ export function PaymentModal({ isOpen, onClose, onSave, payment }: PaymentModalP
           })
       } else {
         setFormData(getInitialFormData())
+        setIsInitialLoad(false)
       }
     })
   }, [isOpen])
 
+  useEffect(() => {
+  if (isOpen && isInitialLoad && formData.clientId) {
+    setIsInitialLoad(false)
+  }
+}, [formData])
+
 
   useEffect(() => {
+    if (isInitialLoad) return
+
     if (formData.serviceType === 'Pacote' && formData.packageId) {
       const selectedPackage = availablePackages.find(p => p.id === formData.packageId)
       if (selectedPackage) {
@@ -111,19 +121,13 @@ export function PaymentModal({ isOpen, onClose, onSave, payment }: PaymentModalP
     }
   }, [formData.serviceType, formData.packageId, availablePackages])
 
-  // Limpa serviceLines ao mudar o tipo de serviço
   useEffect(() => {
+    if (isInitialLoad) return
+
     if (formData.serviceType && formData.serviceLines.length > 0 && formData.packageId === "") {
         setFormData(prev => ({ ...prev, serviceLines: [] }))
     }
   }, [formData.serviceType])
-
-  useEffect(() => {
-    console.log("formData changed:", formData)
-    console.log("Available Packages:", availablePackages)
-    console.log("Available Services:", availableServices)
-  }, [formData])
-
 
   // --- Funções da Grid de Serviços ---
   const handleAddServiceLine = (serviceIdToAdd: string) => {
@@ -307,7 +311,6 @@ export function PaymentModal({ isOpen, onClose, onSave, payment }: PaymentModalP
         newErrors.totalValue = 'O valor total deve ser no mínimo R$ 1,00.'
     }
 
-    console.log(newErrors)
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors)
       return
@@ -320,7 +323,6 @@ export function PaymentModal({ isOpen, onClose, onSave, payment }: PaymentModalP
         clientPhone: clients.find(c => String(c.id) === String(formData.clientId))?.phone || ""
       }
       
-      console.log("Dados de Pagamento a serem salvos:", dataToSend)
       if (payment) {
         await paymentsApi.update(payment.id, dataToSend)
       } else {

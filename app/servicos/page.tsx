@@ -11,6 +11,7 @@ import type { Service } from "@/lib/types"
 import { ServiceModal } from "./service-modal"
 import { CategoryBadge } from "@/components/category-badge"
 import { StatusBadge } from "@/components/status-badge"
+import Loading from "@/components/loading"
 
 export default function ServicesPage() {
   const [services, setServices] = useState<Service[]>([])
@@ -18,6 +19,7 @@ export default function ServicesPage() {
   const [filterName, setFilterName] = useState("")
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [selectedService, setSelectedService] = useState<Service | null>(null)
+  const [isLoading, setIsLoading] = useState(true)
 
   const limitarTexto = (texto: string, limite: number): string => {
     if (texto.length > limite) {
@@ -27,11 +29,14 @@ export default function ServicesPage() {
   };
 
   const loadServices = async () => {
+    setIsLoading(true)
     try {
       const response = await servicesApi.getAll()
       setServices(response.data)
     } catch (error) {
       console.error("Erro ao carregar serviços:", error)
+    } finally {
+      setIsLoading(false)
     }
   }
 
@@ -68,7 +73,8 @@ export default function ServicesPage() {
   }
 
   return (
-    <div className="mx-auto max-w-7xl">
+    <div className="relative mx-auto max-w-7xl">
+      {isLoading && <Loading />}
       <PageHeader
         title="Serviços"
         description="Gerencie os serviços disponíveis em seu estabelecimento."
