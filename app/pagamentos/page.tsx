@@ -8,9 +8,10 @@ import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { CategoryBadge } from "@/components/category-badge"
 import { paymentsApi, professionalsApi, clientsApi } from "@/lib/api"
-import type { Payment, Professional, Client } from "@/lib/types"
+import type { Payment, Professional, Client, Category } from "@/lib/types"
 import { PaymentModal } from "./payment-modal"
 import Loading from "@/components/loading"
+import { CategoryBadgeList } from "@/components/category-badge-list"
 
 function formatGmt3Date(offsetDays = 0) {
   const ms = Date.now() - 3 * 60 * 60 * 1000 + offsetDays * 24 * 60 * 60 * 1000
@@ -233,7 +234,10 @@ export default function PagamentosPage() {
             className="bg-white rounded-xl p-6 border border-[var(--color-border)] hover:shadow-lg transition-shadow"
           >
             <div className="flex items-start justify-between mb-4">
-              <CategoryBadge category={payment.category} />
+              <CategoryBadgeList categoriesStr={Array.from(new Set(
+                    payment.serviceLines?.map((service) => service?.serviceCategory)
+                      .filter((name): name is Category => name !== undefined && name !== null)
+                  )).join(",")} />
               <div className="flex gap-2">
                 <button
                   onClick={() => handleEdit(payment)}
@@ -262,7 +266,10 @@ export default function PagamentosPage() {
                 </div>
                 <div className="flex items-center gap-2 text-[var(--color-text-secondary)] text-sm">
                   <UserCog className="w-4 h-4" />
-                  <span>{payment.professionalName}</span>
+                  <span>{Array.from(new Set(
+                    payment.serviceLines?.map((service) => service?.professionalName)
+                      .filter((name): name is string => name !== undefined && name !== null)
+                  )).join(", ")}</span>
                 </div>
                 <div className="flex items-center gap-2 text-[var(--color-text-secondary)] text-sm">
                   <CalendarIcon className="w-4 h-4" />
@@ -277,6 +284,9 @@ export default function PagamentosPage() {
                   <DollarSign className="w-5 h-5" />
                   <span>R$ {payment.value.toFixed(2)}</span>
                 </div>
+                {payment.isPartialValue && <p className="text-sm text-[var(--color-text-secondary)]">
+                    * Valor parcial com base nos filtros informados
+                </p>}
                 <div className="flex items-center gap-2 text-[var(--color-text-secondary)] text-sm">
                   <CreditCard className="w-4 h-4" />
                   <span>{payment.paymentMethod}</span>

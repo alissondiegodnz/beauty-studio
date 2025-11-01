@@ -60,6 +60,7 @@ export interface ServiceLine {
   id: string
   serviceId: string
   serviceName: string
+  serviceCategory: Category
   value: number
   professionalId: string
   professionalName: string
@@ -79,6 +80,7 @@ export interface PackageService {
   id: string;
   name: string;
   price: number;
+  quantity: number;
 }
 
 export interface Package {

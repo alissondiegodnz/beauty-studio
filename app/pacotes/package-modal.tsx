@@ -60,6 +60,7 @@ export function PackageModal({ isOpen, onClose, onSave, packageToEdit }: Package
             id: s.id,
             name: s.name,
             price: s.price ?? 0,
+            quantity: s.quantity
           })) 
         })
       } else {
@@ -92,6 +93,16 @@ export function PackageModal({ isOpen, onClose, onSave, packageToEdit }: Package
       services: prev.services.filter(service => service.id !== serviceIdToRemove)
     }))
   }
+
+  const handleUpdateServiceLine = (lineId: string, field: keyof Service, value: number) => {
+      setFormData(prev => ({
+        ...prev,
+        services: prev.services.map(line => 
+          line.id === lineId ? { ...line, [field]: value } : line
+        )
+      }))
+    }
+  
 
   // Calcula o valor total avulso dos serviços
   const totalServicesValue = useMemo(() => {
@@ -283,8 +294,15 @@ export function PackageModal({ isOpen, onClose, onSave, packageToEdit }: Package
                       <td className="px-3 py-2 whitespace-nowrap text-sm text-gray-900">
                         {service.name}
                       </td>
-                      <td className="px-3 py-2 whitespace-nowrap text-sm text-right">
-                        R$ {service.price.toFixed(2)}
+                    
+                      <td className="px-3 py-2 whitespace-nowrap text-sm">
+                        <Input
+                          type="number"
+                          step="1.00"
+                          value={service.price}
+                          onChange={(e) => handleUpdateServiceLine(service.id, 'price', parseFloat(e.target.value))}
+                          className="w-full text-right h-8"
+                        />
                       </td>
                       <td className="px-3 py-2 whitespace-nowrap text-right text-sm font-medium">
                         <Button 

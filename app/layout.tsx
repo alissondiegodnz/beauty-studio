@@ -26,12 +26,12 @@ export default function RootLayout({
         {<TopHeader />}
           <div className="flex rounded-1x2 min-h-[calc(100vh-4rem)]">
             <main className="flex p-6 bg-[var(--second-background)] rounded-1x2">
-              <div className="rounded-xl bg-gradient-to-t from-[var(--gold-light)] to-[var(--gold-ultra-light)] p-1 h-full">
+              <div className="rounded-xl bg-gradient-to-t from-[var(--gold-light)] to-[var(--rose-background)] p-1 h-full">
                 <Sidebar />
               </div>
             </main>
             <main className="flex-1 p-6 bg-[var(--second-background)] rounded-1x2">
-              <div className="rounded-xl bg-gradient-to-t from-[var(--gold-light)] to-[var(--gold-ultra-light)] shadow-sm p-16 h-full">
+              <div className="rounded-xl bg-gradient-to-t from-[var(--gold-light)] to-[var(--rose-background)] shadow-sm p-16 h-full">
                 {children}
               </div>
             </main>
