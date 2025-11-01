@@ -77,6 +77,7 @@ export function PaymentModal({ isOpen, onClose, onSave, payment }: PaymentModalP
   useEffect(() => {    
     if (!isOpen) {
       setFormData(getInitialFormData())
+      setErrors({})
       return
     }
 
