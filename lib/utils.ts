@@ -18,3 +18,8 @@ export const limitarTexto = ({ texto, limite }: LimitarTextoProps): string => {
     }
     return texto;
 };
+
+export function formatGmt3Date(offsetDays = 0) {
+  const ms = Date.now() - 3 * 60 * 60 * 1000 + offsetDays * 24 * 60 * 60 * 1000
+  return new Date(ms).toISOString().slice(0, 10)
+}

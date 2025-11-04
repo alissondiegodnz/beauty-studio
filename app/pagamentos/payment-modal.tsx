@@ -12,6 +12,7 @@ import { Textarea } from "@/components/ui/textarea"
 
 import { paymentsApi, clientsApi, professionalsApi, servicesApi, packagesApi } from "@/lib/api" 
 import type { Payment, Client, Professional, Category, PaymentMethod, ServiceType, Package, ServiceLine, Service, PaymentLine } from "@/lib/types"
+import { formatGmt3Date } from "@/lib/utils"
 
 interface PaymentModalProps {
   isOpen: boolean
@@ -43,7 +44,7 @@ export function PaymentModal({ isOpen, onClose, onSave, payment }: PaymentModalP
     clientId: "",
     value: 0,
     isPartialValue: false,
-    date: new Date().toISOString().substring(0, 10),
+    date: formatGmt3Date(0),
     time: new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit', hour12: false }),
     description: "",
     serviceType: "" as ServiceType,

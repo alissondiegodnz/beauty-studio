@@ -11,6 +11,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Textarea } from "@/components/ui/textarea"
 import { appointmentsApi, clientsApi, professionalsApi } from "@/lib/api"
 import type { Appointment, Client, Professional, Category, AppointmentStatus } from "@/lib/types"
+import { formatGmt3Date } from "@/lib/utils"
 
 type ClientSearchProps = {
   clients: Client[]
@@ -159,7 +160,7 @@ export function AppointmentModal({ isOpen, onClose, onSave, appointment }: Appoi
     professionalId: "",
     category: "" as Category | "",
     status: "" as AppointmentStatus | "",
-    date: new Date().toISOString().substring(0, 10),
+    date: formatGmt3Date(0),
     time: new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit', hour12: false }),
     service: "",
     observations: "",
