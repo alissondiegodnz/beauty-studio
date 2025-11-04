@@ -1,7 +1,7 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { DollarSign, Pencil, PlusCircle, Scissors, Trash2, Wrench } from "lucide-react"
+import { BadgeCheck, DollarSign, Pencil, PlusCircle, Scissors, Search, SearchCheck, Tag, Trash2, Wrench } from "lucide-react"
 import { PageHeader } from "@/components/page-header"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -17,6 +17,7 @@ import { limitarTexto } from "@/lib/utils";
 export default function ServicesPage() {
   const [services, setServices] = useState<Service[]>([])
   const [filterCategory, setFilterCategory] = useState("All")
+  const [filterStatus, setFilterStatus] = useState("All")
   const [filterName, setFilterName] = useState("")
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [selectedService, setSelectedService] = useState<Service | null>(null)
@@ -25,7 +26,7 @@ export default function ServicesPage() {
   const loadServices = async () => {
     setIsLoading(true)
     try {
-      const response = await servicesApi.getAll()
+      const response = await servicesApi.getAllStatus()
       setServices(response.data)
     } catch (error) {
       console.error("Erro ao carregar serviços:", error)
@@ -40,10 +41,11 @@ export default function ServicesPage() {
 
   const filteredServices = services.filter((service) => {
     const matchesCategory = filterCategory != "All" ? service.category === filterCategory : true
+    const matchesStatus = filterStatus != "All" ? service.status === filterStatus : true
     const matchesName = filterName
       ? service.name.toLowerCase().includes(filterName.toLowerCase())
       : true
-    return matchesCategory && matchesName
+    return matchesCategory && matchesStatus && matchesName
   })
 
   const handleNewService = () => {
@@ -72,34 +74,65 @@ export default function ServicesPage() {
       <PageHeader
         title="Serviços"
         description="Gerencie os serviços disponíveis em seu estabelecimento."
+        action={
+          <Button
+            onClick={handleNewService}
+            className="ml-auto bg-gradient-to-r from-[var(--gold-accent)] to-[var(--gold-medium)] hover:opacity-70"
+            >
+            <PlusCircle className="mr-2 h-4 w-4" /> Novo Serviço
+          </Button>
+        }
       />
 
-      <div className="flex flex-wrap gap-3 mb-6">
-        <Input
-          placeholder="Buscar por nome"
-          className="max-w-xs"
-          value={filterName}
-          onChange={(e) => setFilterName(e.target.value)}
-        />
-        <Select value={filterCategory} onValueChange={setFilterCategory}>
-          <SelectTrigger className="max-w-xs">
-            <SelectValue placeholder="Categoria" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="All">Todas as Categorias</SelectItem>
-            <SelectItem value="Salão">Salão</SelectItem>
-            <SelectItem value="Estética">Estética</SelectItem>
-            <SelectItem value="Bronze">Bronze</SelectItem>
-            <SelectItem value="Loja de roupas">Loja de roupas</SelectItem>
-          </SelectContent>
-        </Select>
+      <div className="flex flex-wrap gap-3 mb-6 p-4 bg-white rounded-xl shadow-md border border-[var(--color-border)]">
+        <div>
+          <label className="flex items-center gap-2 text-sm font-medium mb-2 text-[var(--color-text-primary)]">
+            <Search className="w-4 h-4" />
+            Nome
+          </label>
+          <Input
+            placeholder="Buscar por nome"
+            className="max-w-xs"
+            value={filterName}
+            onChange={(e) => setFilterName(e.target.value)}
+          />
+        </div>
+        <div>
+          <label className="flex items-center gap-2 text-sm font-medium mb-2 text-[var(--color-text-primary)]">
+            <Tag className="w-4 h-4" />
+            Categoria
+          </label>
+          <Select value={filterCategory} onValueChange={setFilterCategory}>
+            <SelectTrigger className="max-w-xs">
+              <SelectValue placeholder="Categoria" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="All">Todas as Categorias</SelectItem>
+              <SelectItem value="Salão">Salão</SelectItem>
+              <SelectItem value="Estética">Estética</SelectItem>
+              <SelectItem value="Bronze">Bronze</SelectItem>
+              <SelectItem value="Loja de roupas">Loja de roupas</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
 
-        <Button
-          onClick={handleNewService}
-          className="ml-auto bg-gradient-to-r from-[var(--gold-accent)] to-[var(--gold-medium)] hover:opacity-70"
-        >
-          <PlusCircle className="mr-2 h-4 w-4" /> Novo Serviço
-        </Button>
+        <div>
+          <label className="flex items-center gap-2 text-sm font-medium mb-2 text-[var(--color-text-primary)]">
+            <BadgeCheck className="w-4 h-4" />
+            Status
+          </label>
+          <Select value={filterStatus} onValueChange={setFilterStatus}>
+            <SelectTrigger className="max-w-xs">
+              <SelectValue placeholder="Status" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="All">Todos os Status</SelectItem>
+              <SelectItem value="Ativo">Ativo</SelectItem>
+              <SelectItem value="Inativo">Inativo</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+      
       </div>
 
       <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -120,12 +153,12 @@ export default function ServicesPage() {
                 >
                   <Pencil className="w-4 h-4" />
                 </button>
-                <button
+                { /*<button
                   onClick={() => handleDeleteService(String(service.id))}
                   className="p-2 text-red-500 hover:bg-red-50 rounded-lg transition-colors"
                 >
                   <Trash2 className="w-4 h-4" />
-                </button>
+                </button> */}
               </div>
             </div>
             <div className="flex items-center justify-between mb-2">

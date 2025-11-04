@@ -1,21 +1,24 @@
 "use client"
 
 import { useState, useEffect, useMemo, useCallback } from "react"
-import { Plus, Edit, Trash2, Package as PackageIcon, DollarSign, Tag } from "lucide-react"
+import { Plus, Edit, Trash2, Package as PackageIcon, DollarSign, Tag, BadgeCheck, Search } from "lucide-react"
 
 import { PageHeader } from "@/components/page-header"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { packagesApi } from "@/lib/api"
-import type { Package } from "@/lib/types" 
+import type { Package, ProfessionalStatus } from "@/lib/types" 
 import { PackageModal } from "./package-modal" 
 import Loading from "@/components/loading"
 import { limitarTexto } from "@/lib/utils";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { StatusBadge } from "@/components/status-badge"
 
 export default function PackagesPage() {
   const [packages, setPackages] = useState<Package[]>([])
   const [loading, setLoading] = useState(true)
   const [searchTerm, setSearchTerm] = useState("")
+  const [filterStatus, setFilterStatus] = useState("All")
   const [modalState, setModalState] = useState<{ isOpen: boolean; package: Package | null }>({
     isOpen: false,
     package: null
@@ -24,7 +27,7 @@ export default function PackagesPage() {
   const loadPackages = useCallback(async () => {
     setLoading(true)
     try {
-      const response = await packagesApi.getAll()
+      const response = await packagesApi.getAllStatus()
       setPackages(response.data)
     } catch (error) {
       console.error("Erro ao carregar pacotes:", error)
@@ -39,13 +42,14 @@ export default function PackagesPage() {
 
   const filteredPackages = useMemo(() => {
     const lowerCaseSearch = searchTerm.toLowerCase().trim()
-    if (!lowerCaseSearch) return packages
 
-    return packages.filter((pkg) =>
-      pkg.name.toLowerCase().includes(lowerCaseSearch) ||
-      pkg.services.some(s => s.name.toLowerCase().includes(lowerCaseSearch))
-    )
-  }, [packages, searchTerm])
+    return packages.filter((pkg) => {
+      const matchesStatus = filterStatus != "All" ? pkg.status === filterStatus : true
+      const matchesName = lowerCaseSearch ? (pkg.name.toLowerCase().includes(lowerCaseSearch) ||
+      pkg.services.some(s => s.name.toLowerCase().includes(lowerCaseSearch))) : true
+      return matchesStatus && matchesName
+    })
+  }, [packages, searchTerm, filterStatus])
   
   const handleOpenNewModal = () => {
     setModalState({ isOpen: true, package: null })
@@ -98,16 +102,40 @@ export default function PackagesPage() {
       />
 
       {/* FERRAMENTAS DE BUSCA E FILTRO (Simplificado) */}
-      <div className="grid grid-cols-5 gap-6 mb-6">
-        <div className="col-span-5 p-4 bg-white rounded-xl shadow-md border border-[var(--color-border)]">
-          <h3 className="text-sm font-medium mb-4 text-[var(--color-text-primary)]">Busca</h3>
-          <Input
-            type="search"
-            placeholder="Buscar pacote por nome ou serviços incluídos..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="max-w-md border-[var(--color-border)]"
-          />
+      <div className="grid grid-cols-3 gap-6 mb-6">
+        <div className="col-span-3 p-4 bg-white rounded-xl shadow-md border border-[var(--color-border)]">
+          <div className="flex flex-wrap gap-3 mb-3">
+          <div className="flex-1">
+            <label className="flex items-center gap-2 text-sm font-medium mb-2 text-[var(--color-text-primary)]">
+              <Search className="w-4 h-4" />
+              Nome
+            </label>
+            <Input
+              type="search"
+              placeholder="Buscar pacote por nome ou serviços incluídos..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="max-w-md border-[var(--color-border)]"
+            />
+          </div>
+
+          <div className="flex-2">
+            <label className="flex items-center gap-2 text-sm font-medium mb-2 text-[var(--color-text-primary)]">
+              <BadgeCheck className="w-4 h-4" />
+              Status
+            </label>
+            <Select value={filterStatus} onValueChange={setFilterStatus}>
+              <SelectTrigger className="max-w-xs">
+                <SelectValue placeholder="Status" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="All">Todos os Status</SelectItem>
+                <SelectItem value="Ativo">Ativo</SelectItem>
+                <SelectItem value="Inativo">Inativo</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+          </div>
         </div>
       </div>
 
@@ -131,6 +159,9 @@ export default function PackagesPage() {
             key={String(pkg.id)}
             className="bg-white rounded-xl p-6 border border-[var(--color-border)] hover:shadow-lg transition-shadow"
           >
+            <div className="flex gap-2 mb-4">
+              <StatusBadge status={pkg.status as ProfessionalStatus} />
+            </div>
             <div className="flex items-start justify-between mb-4">
               <div className="flex items-center gap-2">
                 <PackageIcon className="w-5 h-5 text-[var(--gold-medium)]" />
@@ -144,12 +175,12 @@ export default function PackagesPage() {
                 >
                   <Edit className="w-4 h-4" />
                 </button>
-                <button
+                { /*<button
                   onClick={() => handleDeletePackage(String(pkg.id))}
                   className="p-2 text-red-500 hover:bg-red-50 rounded-lg transition-colors"
                 >
                   <Trash2 className="w-4 h-4" />
-                </button>
+                </button> */}
               </div>
             </div>
 

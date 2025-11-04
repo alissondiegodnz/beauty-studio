@@ -39,7 +39,7 @@ export function ServiceModal({ isOpen, onClose, onSave, service }: ServiceModalP
             const newFormData = {
                 name: service.name,
                 category: service.category as Category,
-                status: "Ativo" as ProfessionalStatus,
+                status: service.status as ProfessionalStatus,
                 price: String(service.price ?? ""),
                 description: service.description ?? ""
             }
