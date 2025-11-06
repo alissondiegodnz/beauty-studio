@@ -235,8 +235,7 @@ export default function RelatoriosPage() {
 
         {/* Payment Methods Chart */}
         <div className="bg-white rounded-xl p-6 border border-[var(--color-border)]">
-          <h3 className="font-bold text-lg text-[var(--color-text-primary)]">Métodos de Pagamento</h3>
-          <p className="text-sm text-[var(--color-destructive)] mt-1 mb-4">* Calculado sobre o total do período (desconsiderando filtros)</p>
+          <h3 className="font-bold text-lg mb-4 text-[var(--color-text-primary)]">Métodos de Pagamento</h3>
           <ResponsiveContainer width="100%" height={300}>
             <BarChart data={reportData.paymentMethods}>
               <CartesianGrid strokeDasharray="3 3" stroke="#F3E8EE" />
