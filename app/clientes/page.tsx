@@ -81,20 +81,21 @@ export default function ClientesPage() {
   }
 
   return (
-    <div className="relative mx-auto max-w-7xl">
+    <div className="relative max-w-7xl mx-auto p-6">
       {isLoading && <Loading />}
       <PageHeader
         title="Clientes"
         description="Gerencie o cadastro de clientes"
         action={
           <Button
-            onClick={() => {
+            onClick={() => { 
               setEditingClient(null)
               setIsModalOpen(true)
             }}
-            className="bg-gradient-to-r from-[var(--gold-accent)] to-[var(--gold-medium)] hover:opacity-70"
+            className="bg-gradient-to-r from-[var(--gold-accent)] to-[var(--gold-medium)] hover:opacity-70 
+    text-white text-base py-5 rounded-lg flex items-center gap-4 shadow-md transition-all"
           >
-            <Plus className="w-4 h-4 mr-2" />
+            <Plus className="w-6 h-6" />
             Novo Cliente
           </Button>
         }

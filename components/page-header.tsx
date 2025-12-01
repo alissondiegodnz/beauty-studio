@@ -9,8 +9,8 @@ interface PageHeaderProps {
 
 export function PageHeader({ title, description, action, className = "" }: PageHeaderProps) {
   return (
-    <div className="flex flex-col items-center justify-center mb-12 w-full">
-      <div className="text-center mb-4">
+    <div className="flex items-center justify-between mb-6">
+      <div className="col-span-4 mb-4">
         <h1 
           className="
             text-3xl 
@@ -29,7 +29,7 @@ export function PageHeader({ title, description, action, className = "" }: PageH
         </h1>
         <p className="text-[var(--color-text-secondary)]">{description}</p>
       </div>
-      {action && <div>{action}</div>}
+      {action && <div className="col-span-2">{action}</div>}
     </div>
   )
 }
